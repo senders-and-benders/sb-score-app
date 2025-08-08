@@ -4,7 +4,7 @@ import Header from './components/Header';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import Climbers from './components/Climbers';
-import ClimbingRoutes from './components/Routes';
+import SelfScoring from './components/SelfScoring';
 import Scores from './components/Scores';
 import './App.css';
 
@@ -18,8 +18,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/climbers" element={<Climbers />} />
-            <Route path="/routes" element={<ClimbingRoutes />} />
-            <Route path="/scores" element={<Scores />} />
+            <Route path="/self-scoring" element={<SelfScoring />} />
+            <Route path="/scores/:climberId" element={<Scores />} />
           </Routes>
         </div>
       </div>

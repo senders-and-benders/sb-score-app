@@ -3,6 +3,7 @@ from flask_cors import CORS
 import sqlite3
 import os
 from datetime import datetime
+import csv
 
 app = Flask(__name__)
 CORS(app)
@@ -29,18 +30,73 @@ def init_db():
             date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    
-    # Create routes table
+
+    # Create gyms table with schema
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS gyms (
+            id INTEGER PRIMARY KEY,
+            gymName TEXT NOT NULL
+        )
+    ''')
+    # Insert data into gyms table
+    gym_count = conn.execute('SELECT COUNT(*) as count FROM gyms').fetchone()['count']  # Clear existing data
+    if(gym_count == 0):
+        with open('./data/gyms.csv', newline='') as gyms_file:
+            gyms_reader = csv.DictReader(gyms_file)
+            gyms = [row for row in gyms_reader]
+            for gym in gyms:
+                conn.execute(
+                    '''
+                    INSERT INTO gyms (id, gymName)
+                    VALUES (?, ?)
+                    ''',
+                    (gym['gym_id'], gym['gym_name'])
+                )
+
+    # Create routes table with updated schema
     conn.execute('''
         CREATE TABLE IF NOT EXISTS routes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
+            gym_id INTEGER NOT NULL,
+            areaName TEXT NOT NULL,
+            wallName TEXT NOT NULL,
+            climbType TEXT NOT NULL,
             grade TEXT NOT NULL,
-            location TEXT NOT NULL,
-            description TEXT,
-            date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (gym_id) REFERENCES gyms (id)
         )
     ''')
+
+    # Insert joined data from grades.csv and gym_walls.csv into routes table
+    routes_count = conn.execute('SELECT COUNT(*) as count FROM routes').fetchone()['count']  # Clear existing data
+    if(routes_count == 0):
+        # Read grades.csv
+        with open('./data/grades.csv', newline='') as grades_file:
+            grades_reader = csv.DictReader(grades_file)
+            grades = [row for row in grades_reader]
+
+        # Read gym_walls.csv
+        with open('./data/gym_walls.csv', newline='') as walls_file:
+            walls_reader = csv.DictReader(walls_file)
+            walls = [row for row in walls_reader]
+
+        # Join grades and gym walls by climbType (assuming both have 'climbType' column)
+        for wall in walls:
+            for grade in grades:
+                if wall.get('climb_type') == grade.get('climb_type'):
+                    conn.execute(
+                        '''
+                        INSERT INTO routes (gym_id, areaName, wallName, climbType, grade)
+                        VALUES (?, ?, ?, ?, ?)
+                        ''',
+                        (
+                            wall.get('gym_id', ''),
+                            wall.get('area_name', ''),
+                            wall.get('wall_name', ''),
+                            wall.get('climb_type', ''),
+                            grade.get('grade', '')
+                        )
+                    )
     
     # Create scores table
     conn.execute('''
@@ -61,7 +117,6 @@ def init_db():
     conn.close()
 
 # API Routes
-
 @app.route('/api/stats', methods=['GET'])
 def get_stats():
     """Get dashboard statistics"""
@@ -139,72 +194,104 @@ def delete_climber(climber_id):
     
     return jsonify({'message': 'Climber deleted successfully'})
 
-# Routes endpoints
+# Gyms endpoints
+@app.route('/api/gyms', methods=['GET'])
+def get_gyms():
+    """Get all gyms"""
+    conn = get_db_connection()
+    gyms = conn.execute('SELECT * FROM gyms ORDER BY gymName').fetchall()
+    conn.close()
+    
+    return jsonify([dict(gym) for gym in gyms])
+
 @app.route('/api/routes', methods=['GET'])
 def get_routes():
     """Get all climbing routes"""
     conn = get_db_connection()
-    routes = conn.execute('SELECT * FROM routes ORDER BY grade, name').fetchall()
+    query = '''
+        SELECT 
+            r.id, 
+            g.gymName, 
+            r.areaName, 
+            r.wallName, 
+            r.climbType, 
+            r.grade
+        FROM routes r
+        LEFT JOIN gyms g ON r.gym_id = g.id
+       ORDER BY r.grade, g.gymName, r.wallName
+    '''
+
+    routes = conn.execute(query).fetchall()
     conn.close()
     
     return jsonify([dict(route) for route in routes])
 
-@app.route('/api/routes', methods=['POST'])
-def add_route():
-    """Add a new climbing route"""
-    data = request.get_json()
-    
-    required_fields = ['name', 'grade', 'location']
-    if not data or not all(field in data for field in required_fields):
-        return jsonify({'error': 'Name, grade, and location are required'}), 400
-    
+@app.route('/api/routes/locations/<int:gym_id>', methods=['GET'])
+def get_routes_by_gym(gym_id):
+    """Get all routes for a specific gym"""
     conn = get_db_connection()
-    
-    conn.execute(
-        'INSERT INTO routes (name, grade, location, description) VALUES (?, ?, ?, ?)',
-        (data['name'], data['grade'], data['location'], data.get('description', ''))
-    )
-    conn.commit()
+    routes = conn.execute(
+        '''
+        SELECT r.id, r.areaName, r.wallName, r.climbType, r.grade
+        FROM routes r
+        WHERE r.gym_id = ?
+        ORDER BY r.grade, r.wallName
+        ''',
+        (gym_id,)
+    ).fetchall()
     conn.close()
-    
-    return jsonify({'message': 'Route added successfully'}), 201
+    return jsonify([dict(route) for route in routes])
 
-@app.route('/api/routes/<int:route_id>', methods=['DELETE'])
-def delete_route(route_id):
-    """Delete a climbing route"""
-    conn = get_db_connection()
-    
-    # First delete all scores for this route
-    conn.execute('DELETE FROM scores WHERE route_id = ?', (route_id,))
-    
-    # Then delete the route
-    result = conn.execute('DELETE FROM routes WHERE id = ?', (route_id,))
-    
-    conn.commit()
-    conn.close()
-    
-    if result.rowcount == 0:
-        return jsonify({'error': 'Route not found'}), 404
-    
-    return jsonify({'message': 'Route deleted successfully'})
+# Get scores
+# Setup base query
+base_score_query = ''' 
+SELECT 
+    s.*, 
+    c.name as climberName, 
+    g.gymName, 
+    r.wallName, 
+    r.grade
+FROM scores s
+JOIN climbers c ON s.climber_id = c.id
+JOIN routes r ON s.route_id = r.id
+JOIN gyms g ON r.gym_id = g.id
+'''
 
-# Scores endpoints
 @app.route('/api/scores', methods=['GET'])
 def get_scores():
     """Get all scores with climber and route info"""
     conn = get_db_connection()
+    scores = conn.execute(f'''
+        {base_score_query}
+        ORDER BY s.date_recorded DESC
+    ''').fetchall()
+    conn.close()
     
-    scores = conn.execute('''
-        SELECT s.*, c.name as climber_name, r.name as route_name, r.grade
-        FROM scores s
-        JOIN climbers c ON s.climber_id = c.id
-        JOIN routes r ON s.route_id = r.id
+    return jsonify([dict(score) for score in scores])
+
+@app.route('/api/scores/climber/<int:climber_id>', methods=['GET'])
+def get_climber_scores(climber_id):
+    """Get scores for a specific climber"""
+    conn = get_db_connection()
+    
+    # First check if climber exists
+    climber = conn.execute('SELECT * FROM climbers WHERE id = ?', (climber_id,)).fetchone()
+    if not climber:
+        conn.close()
+        return jsonify({'error': 'Climber not found'}), 404
+    
+    scores = conn.execute(f'''
+        {base_score_query}
+        WHERE s.climber_id = {climber_id}
         ORDER BY s.date_recorded DESC
     ''').fetchall()
     
     conn.close()
     
-    return jsonify([dict(score) for score in scores])
+    return jsonify({
+        'climber': dict(climber),
+        'scores': [dict(score) for score in scores]
+    })
 
 @app.route('/api/scores', methods=['POST'])
 def add_score():

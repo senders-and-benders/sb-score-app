@@ -1,0 +1,32 @@
+gym_id,area_name,climb_type,wall_name
+1,Onestead,Bouldering,Mini-Me
+1,Onestead,Bouldering,L'Angle
+1,Onestead,Bouldering,Big Bulge
+1,Onestead,Bouldering,Slip Slab
+1,Onestead,Bouldering,Kaizen
+1,Onestead,Bouldering,Library
+1,Onestead,Bouldering,The Cave
+1,Twostead,Bouldering,Hidden Slab
+1,Twostead,Bouldering,Nazare 
+1,Twostead,Bouldering,Crystal Ball 
+1,Twostead,Bouldering,Open Book
+2,Milton,Bouldering,Mirage
+2,Milton,Bouldering,Window Wall
+2,Milton,Bouldering,Zepplin
+2,Milton,Bouldering,The Island
+2,Milton,Bouldering,Void
+2,Milton,Bouldering,Rubiks
+2,Milton,Bouldering,Rave Cave
+3,Boulder Hall,Bouldering,Atelier
+3,Boulder Hall,Bouldering,The Burrow
+3,Boulder Hall,Bouldering,Stronarch
+3,Boulder Hall,Bouldering,Latte
+3,Boulder Hall,Bouldering,Jawa
+3,Boulder Hall,Bouldering,Graceland
+3,Rope Hall,Ropes,Wonderwall
+3,Rope Hall,Ropes,The Arch
+3,Rope Hall,Ropes,Waterfall
+3,Rope Hall,Ropes,Martini Wall
+3,Rope Hall,Ropes,Wave Wall
+3,Rope Hall,Ropes,Nursery
+3,Rope Hall,Ropes,2020 Wall

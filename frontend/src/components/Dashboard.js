@@ -44,16 +44,16 @@ const Dashboard = () => {
         <div className="card">
           <h3>🏆 Recent Activity</h3>
           <p>Welcome to the Senders & Benders climbing app!</p>
-          <p>Start by adding climbers and routes to begin tracking scores.</p>
+          <p>Use the Self Scoring page to record your climbing attempts.</p>
         </div>
         
         <div className="card">
           <h3>📈 Quick Actions</h3>
-          <button className="btn" style={{marginRight: '1rem'}}>
-            Add New Climber
+          <button className="btn" style={{marginRight: '1rem'}} onClick={() => window.location.href = '/climbers'}>
+            Manage Climbers
           </button>
-          <button className="btn">
-            Add New Route
+          <button className="btn" onClick={() => window.location.href = '/self-scoring'}>
+            Start Scoring
           </button>
         </div>
       </div>

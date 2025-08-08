@@ -1,34 +1,39 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Scores = () => {
+  const { climberId } = useParams();
+  const navigate = useNavigate();
   const [scores, setScores] = useState([]);
-  const [climbers, setClimbers] = useState([]);
-  const [routes, setRoutes] = useState([]);
-  const [newScore, setNewScore] = useState({
-    climber_id: '',
-    route_id: '',
-    completed: false,
-    attempts: 1,
-    notes: ''
-  });
+  const [currentClimber, setCurrentClimber] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (climberId) {
+      fetchClimberScores();
+    } else {
+      fetchData();
+    }
+  }, [climberId]);
+
+  const fetchClimberScores = async () => {
+    try {
+      const response = await axios.get(`/api/scores/climber/${climberId}`);
+      setCurrentClimber(response.data.climber);
+      setScores(response.data.scores);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to load climber scores');
+      setLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
-      const [scoresRes, climbersRes, routesRes] = await Promise.all([
-        axios.get('/api/scores'),
-        axios.get('/api/climbers'),
-        axios.get('/api/routes')
-      ]);
+      const scoresRes = await axios.get('/api/scores');
       setScores(scoresRes.data);
-      setClimbers(climbersRes.data);
-      setRoutes(routesRes.data);
       setLoading(false);
     } catch (err) {
       setError('Failed to load data');
@@ -36,28 +41,15 @@ const Scores = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post('/api/scores', newScore);
-      setNewScore({
-        climber_id: '',
-        route_id: '',
-        completed: false,
-        attempts: 1,
-        notes: ''
-      });
-      fetchData();
-    } catch (err) {
-      setError('Failed to add score');
-    }
-  };
-
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this score?')) {
       try {
         await axios.delete(`/api/scores/${id}`);
-        fetchData();
+        if (climberId) {
+          fetchClimberScores();
+        } else {
+          fetchData();
+        }
       } catch (err) {
         setError('Failed to delete score');
       }
@@ -65,97 +57,68 @@ const Scores = () => {
   };
 
   const getClimberName = (climberId) => {
-    const climber = climbers.find(c => c.id === climberId);
-    return climber ? climber.name : 'Unknown';
+    // For individual scores, we get the climber name from the score data directly
+    return scores.find(s => s.climber_id === climberId)?.climberName || 'Unknown';
   };
 
-  const getRouteInfo = (routeId) => {
-    const route = routes.find(r => r.id === routeId);
-    return route ? { name: route.name, grade: route.grade } : { name: 'Unknown', grade: '' };
+  const getRouteInfo = (score) => {
+    return {
+      gymName: score.gymName || 'Unknown Gym',
+      wallName: score.wallName || 'Unknown Wall',
+      grade: score.grade || ''
+    };
   };
 
   if (loading) return <div className="loading">Loading scores...</div>;
 
+  // Filter scores if we're in self-scoring mode
+  const filteredScores = climberId 
+    ? scores.filter(score => score.climber_id === parseInt(climberId))
+    : scores;
+
   return (
     <div>
-      <h2>Climbing Scores</h2>
+      <h2>
+        {climberId && currentClimber 
+          ? `${currentClimber.name}'s Climbing Scores` 
+          : 'Climbing Scores'
+        }
+      </h2>
+      
+      {climberId && currentClimber && (
+        <div className="card" style={{ backgroundColor: '#e8f5e8', marginBottom: '1rem' }}>
+          <p>
+            <strong>Viewing scores for: {currentClimber.name}</strong> 
+            <span style={{ marginLeft: '1rem' }}>
+              <button 
+                className="btn" 
+                onClick={() => navigate('/self-scoring')}
+                style={{ fontSize: '0.9rem', padding: '0.3rem 0.8rem' }}
+              >
+                Back to Self Scoring
+              </button>
+            </span>
+          </p>
+        </div>
+      )}
       
       {error && <div className="error">{error}</div>}
-      
-      <div className="card">
-        <h3>Record New Attempt</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Climber:</label>
-            <select
-              value={newScore.climber_id}
-              onChange={(e) => setNewScore({...newScore, climber_id: e.target.value})}
-              required
-            >
-              <option value="">Select a climber</option>
-              {climbers.map(climber => (
-                <option key={climber.id} value={climber.id}>{climber.name}</option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Route:</label>
-            <select
-              value={newScore.route_id}
-              onChange={(e) => setNewScore({...newScore, route_id: e.target.value})}
-              required
-            >
-              <option value="">Select a route</option>
-              {routes.map(route => (
-                <option key={route.id} value={route.id}>
-                  {route.name} ({route.grade})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={newScore.completed}
-                onChange={(e) => setNewScore({...newScore, completed: e.target.checked})}
-              />
-              Completed (Send)
-            </label>
-          </div>
-          <div className="form-group">
-            <label>Number of Attempts:</label>
-            <input
-              type="number"
-              min="1"
-              value={newScore.attempts}
-              onChange={(e) => setNewScore({...newScore, attempts: parseInt(e.target.value)})}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Notes:</label>
-            <textarea
-              value={newScore.notes}
-              onChange={(e) => setNewScore({...newScore, notes: e.target.value})}
-              rows="3"
-              placeholder="Any notes about the climb..."
-            />
-          </div>
-          <button type="submit" className="btn">Record Score</button>
-        </form>
-      </div>
 
       <div>
-        <h3>Recent Scores</h3>
-        {scores.map(score => {
-          const routeInfo = getRouteInfo(score.route_id);
+        <h3>
+          {climberId && currentClimber 
+            ? `${currentClimber.name}'s Recent Scores` 
+            : 'Recent Scores'
+          }
+        </h3>
+        {filteredScores.map(score => {
+          const routeInfo = getRouteInfo(score);
           return (
             <div key={score.id} className="card">
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <div>
                   <h4>
-                    🧗‍♂️ {getClimberName(score.climber_id)} - {routeInfo.name}
+                    🧗‍♂️ {climberId ? '' : `${getClimberName(score.climber_id)} - `}{routeInfo.gymName} - {routeInfo.wallName}
                     <span className="grade-badge" style={{marginLeft: '1rem'}}>
                       {routeInfo.grade}
                     </span>
@@ -179,9 +142,14 @@ const Scores = () => {
         })}
       </div>
       
-      {scores.length === 0 && (
+      {filteredScores.length === 0 && (
         <div className="card">
-          <p>No scores recorded yet. Start climbing and recording your attempts!</p>
+          <p>
+            {climberId && currentClimber 
+              ? `No scores recorded yet for ${currentClimber.name}. Start climbing and recording your attempts!`
+              : 'No scores recorded yet. Start climbing and recording your attempts!'
+            }
+          </p>
         </div>
       )}
     </div>

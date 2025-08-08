@@ -15,7 +15,7 @@ const Navigation = () => {
             Dashboard
           </Link>
         </li>
-        <li>
+                <li>
           <Link 
             to="/climbers" 
             className={location.pathname === '/climbers' ? 'active' : ''}
@@ -25,18 +25,10 @@ const Navigation = () => {
         </li>
         <li>
           <Link 
-            to="/routes" 
-            className={location.pathname === '/routes' ? 'active' : ''}
+            to="/self-scoring" 
+            className={location.pathname === '/self-scoring' ? 'active' : ''}
           >
-            Routes
-          </Link>
-        </li>
-        <li>
-          <Link 
-            to="/scores" 
-            className={location.pathname === '/scores' ? 'active' : ''}
-          >
-            Scores
+            Self Scoring
           </Link>
         </li>
       </ul>

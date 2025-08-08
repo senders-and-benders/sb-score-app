@@ -4,9 +4,9 @@ import axios from 'axios';
 const Routes = () => {
   const [routes, setRoutes] = useState([]);
   const [newRoute, setNewRoute] = useState({
-    name: '',
+    gymLocation: '',
+    wallName: '',
     grade: '',
-    location: '',
     description: ''
   });
   const [loading, setLoading] = useState(true);
@@ -16,6 +16,26 @@ const Routes = () => {
     '5.5', '5.6', '5.7', '5.8', '5.9', '5.10a', '5.10b', '5.10c', '5.10d',
     '5.11a', '5.11b', '5.11c', '5.11d', '5.12a', '5.12b', '5.12c', '5.12d',
     '5.13a', '5.13b', '5.13c', '5.13d', '5.14a', '5.14b', '5.14c', '5.14d'
+  ];
+
+  const gymLocationOptions = [
+    'Downtown Boulder',
+    'Uptown Boulder',
+    'Denver Gym',
+    'Golden Gym',
+    'Boulder Canyon',
+    'Flatirons Gym'
+  ];
+
+  const wallNameOptions = [
+    'Main Wall',
+    'Overhang Wall',
+    'Slab Wall',
+    'Cave',
+    'Competition Wall',
+    'Training Wall',
+    'Beginner Wall',
+    'Advanced Wall'
   ];
 
   useEffect(() => {
@@ -37,7 +57,7 @@ const Routes = () => {
     e.preventDefault();
     try {
       await axios.post('/api/routes', newRoute);
-      setNewRoute({ name: '', grade: '', location: '', description: '' });
+      setNewRoute({ gymLocation: '', wallName: '', grade: '', description: '' });
       fetchRoutes();
     } catch (err) {
       setError('Failed to add route');
@@ -67,13 +87,30 @@ const Routes = () => {
         <h3>Add New Route</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Route Name:</label>
-            <input
-              type="text"
-              value={newRoute.name}
-              onChange={(e) => setNewRoute({...newRoute, name: e.target.value})}
+            <label>Gym Location:</label>
+            <select
+              value={newRoute.gymLocation}
+              onChange={(e) => setNewRoute({...newRoute, gymLocation: e.target.value})}
               required
-            />
+            >
+              <option value="">Select a gym location</option>
+              {gymLocationOptions.map(location => (
+                <option key={location} value={location}>{location}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label>Wall Name:</label>
+            <select
+              value={newRoute.wallName}
+              onChange={(e) => setNewRoute({...newRoute, wallName: e.target.value})}
+              required
+            >
+              <option value="">Select a wall</option>
+              {wallNameOptions.map(wall => (
+                <option key={wall} value={wall}>{wall}</option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label>Grade:</label>
@@ -87,15 +124,6 @@ const Routes = () => {
                 <option key={grade} value={grade}>{grade}</option>
               ))}
             </select>
-          </div>
-          <div className="form-group">
-            <label>Location:</label>
-            <input
-              type="text"
-              value={newRoute.location}
-              onChange={(e) => setNewRoute({...newRoute, location: e.target.value})}
-              required
-            />
           </div>
           <div className="form-group">
             <label>Description:</label>
@@ -112,9 +140,10 @@ const Routes = () => {
       <div className="route-list">
         {routes.map(route => (
           <div key={route.id} className="card">
-            <h3>🧗 {route.name}</h3>
+            <h3>🧗 {route.gymLocation} - {route.wallName}</h3>
             <div className="grade-badge">{route.grade}</div>
-            <p>📍 {route.location}</p>
+            <p>📍 {route.gymLocation}</p>
+            <p>🧱 {route.wallName}</p>
             {route.description && <p>{route.description}</p>}
             <button 
               className="btn btn-danger"
