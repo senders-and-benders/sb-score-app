@@ -17,102 +17,123 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def get_create_table_script(table_name):
+    """Creates inital table structure from a file"""
+    #Open SQL file
+    with open(f'./table_loaders/{table_name}.sql', 'r') as file:
+        return file.read()
+
+def get_initial_table_data(table_name):
+    """Get initial data for a table from a CSV file"""
+    with open(f'./table_loaders/{table_name}.csv', newline='') as data_file:
+        data_reader = csv.DictReader(data_file)
+        return [row for row in data_reader]
+
 def init_db():
     """Initialize database with tables"""
     conn = get_db_connection()
     
-    # Create climbers table
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS climbers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
+    # Create tables if they don't exist
+    conn.execute(get_create_table_script('climbers'))
+    conn.execute(get_create_table_script('grades'))
+    conn.execute(get_create_table_script('gyms'))
+    conn.execute(get_create_table_script('gym_areas'))
+    conn.execute(get_create_table_script('walls'))
+    conn.execute(get_create_table_script('scores'))
+    conn.commit()
 
-    # Create gyms table with schema
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS gyms (
-            id INTEGER PRIMARY KEY,
-            gymName TEXT NOT NULL
-        )
-    ''')
-    # Insert data into gyms table
+    # Insert data if there is no existing data
+    #Climbers 
+    climbers_count = conn.execute('SELECT COUNT(*) as count FROM climbers').fetchone()['count']  # Clear existing data
+    if(climbers_count == 0):
+        climber_data = get_initial_table_data('climbers')
+        for climber in climber_data:
+            conn.execute(
+                '''
+                INSERT INTO climbers (name, email)
+                VALUES (?, ?)
+                ''',
+                (climber['name'], climber['email'])
+            )
+
+    # Grades table
+    grades_count = conn.execute('SELECT COUNT(*) as count FROM grades').fetchone()['count']  # Clear existing data
+    if(grades_count == 0):
+        grade_data = get_initial_table_data('grades')
+        for grade in grade_data:
+            conn.execute(
+                '''
+                INSERT INTO grades (climbType, grade)
+                VALUES (?, ?)
+                ''',
+                (grade['climb_type'], grade['grade'])
+            )
+
+    # Gyms table
     gym_count = conn.execute('SELECT COUNT(*) as count FROM gyms').fetchone()['count']  # Clear existing data
     if(gym_count == 0):
-        with open('./data/gyms.csv', newline='') as gyms_file:
-            gyms_reader = csv.DictReader(gyms_file)
-            gyms = [row for row in gyms_reader]
-            for gym in gyms:
-                conn.execute(
-                    '''
-                    INSERT INTO gyms (id, gymName)
-                    VALUES (?, ?)
-                    ''',
-                    (gym['gym_id'], gym['gym_name'])
-                )
+        gym_data = get_initial_table_data('gyms')
+        for gym in gym_data:
+            conn.execute(
+                '''
+                INSERT INTO gyms (id, gymName)
+                VALUES (?, ?)
+                ''',
+                (gym['gym_id'], gym['gym_name'])
+            )
 
-    # Create routes table with updated schema
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS routes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            gym_id INTEGER NOT NULL,
-            areaName TEXT NOT NULL,
-            wallName TEXT NOT NULL,
-            climbType TEXT NOT NULL,
-            grade TEXT NOT NULL,
-            date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (gym_id) REFERENCES gyms (id)
-        )
-    ''')
+    # Gym Areas table
+    gym_area_count = conn.execute('SELECT COUNT(*) as count FROM gym_areas').fetchone()['count']  # Clear existing data
+    if(gym_area_count == 0):
+        gym_area_data = get_initial_table_data('gym_areas')
+        for gym_area in gym_area_data:
+            conn.execute(
+                '''
+                INSERT INTO gym_areas (id, gym_id, areaName)
+                VALUES (?, ?, ?)
+                ''',
+                (gym_area['id'], gym_area['gym_id'], gym_area['area_name'])
+            )
 
-    # Insert joined data from grades.csv and gym_walls.csv into routes table
-    routes_count = conn.execute('SELECT COUNT(*) as count FROM routes').fetchone()['count']  # Clear existing data
-    if(routes_count == 0):
+    # Walls table
+    walls_count = conn.execute('SELECT COUNT(*) as count FROM walls').fetchone()['count']  # Clear existing data
+    if(walls_count == 0):
         # Read grades.csv
-        with open('./data/grades.csv', newline='') as grades_file:
-            grades_reader = csv.DictReader(grades_file)
-            grades = [row for row in grades_reader]
+        wall_data = get_initial_table_data('walls')
+        for wall in wall_data:
+            conn.execute(
+                '''
+                INSERT INTO walls (gym_id, gym_area_id, wallName, climbType)
+                VALUES (?, ?, ?, ?)
+                ''',
+                (
+                    wall.get('gym_id', ''),
+                    wall.get('gym_area_id', ''),
+                    wall.get('wall_name', ''),
+                    wall.get('climb_type', ''),
+                )
+            )
 
-        # Read gym_walls.csv
-        with open('./data/gym_walls.csv', newline='') as walls_file:
-            walls_reader = csv.DictReader(walls_file)
-            walls = [row for row in walls_reader]
+    # Scores table
+    scores_count = conn.execute('SELECT COUNT(*) as count FROM scores').fetchone()['count']  # Clear existing data
+    if(scores_count == 0):
+        score_data = get_initial_table_data('scores')
+        for score in score_data:
+            conn.execute(
+                '''
+                INSERT INTO scores (climber_id, wall_id, grade, completed, attempts, notes)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ''',
+                (
+                    score['climber_id'],
+                    score['wall_id'],
+                    score['grade'],
+                    score['completed'],
+                    score['attempts'],
+                    score['notes']
+                )
+            )
 
-        # Join grades and gym walls by climbType (assuming both have 'climbType' column)
-        for wall in walls:
-            for grade in grades:
-                if wall.get('climb_type') == grade.get('climb_type'):
-                    conn.execute(
-                        '''
-                        INSERT INTO routes (gym_id, areaName, wallName, climbType, grade)
-                        VALUES (?, ?, ?, ?, ?)
-                        ''',
-                        (
-                            wall.get('gym_id', ''),
-                            wall.get('area_name', ''),
-                            wall.get('wall_name', ''),
-                            wall.get('climb_type', ''),
-                            grade.get('grade', '')
-                        )
-                    )
-    
-    # Create scores table
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS scores (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            climber_id INTEGER NOT NULL,
-            route_id INTEGER NOT NULL,
-            completed BOOLEAN NOT NULL DEFAULT 0,
-            attempts INTEGER NOT NULL DEFAULT 1,
-            notes TEXT,
-            date_recorded TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (climber_id) REFERENCES climbers (id),
-            FOREIGN KEY (route_id) REFERENCES routes (id)
-        )
-    ''')
-    
     conn.commit()
     conn.close()
 
@@ -123,14 +144,14 @@ def get_stats():
     conn = get_db_connection()
     
     total_climbers = conn.execute('SELECT COUNT(*) as count FROM climbers').fetchone()['count']
-    total_routes = conn.execute('SELECT COUNT(*) as count FROM routes').fetchone()['count']
+    total_walls = conn.execute('SELECT COUNT(*) as count FROM walls').fetchone()['count']
     total_ascents = conn.execute('SELECT COUNT(*) as count FROM scores WHERE completed = 1').fetchone()['count']
     
     conn.close()
     
     return jsonify({
         'totalClimbers': total_climbers,
-        'totalRoutes': total_routes,
+        'totalWalls': total_walls,
         'totalAscents': total_ascents
     })
 
@@ -196,7 +217,7 @@ def delete_climber(climber_id):
 
 # Gyms endpoints
 @app.route('/api/gyms', methods=['GET'])
-def get_gyms():
+def get_all_gyms():
     """Get all gyms"""
     conn = get_db_connection()
     gyms = conn.execute('SELECT * FROM gyms ORDER BY gymName').fetchall()
@@ -204,62 +225,150 @@ def get_gyms():
     
     return jsonify([dict(gym) for gym in gyms])
 
-@app.route('/api/routes', methods=['GET'])
-def get_routes():
-    """Get all climbing routes"""
+@app.route('/api/gym/<int:gym_id>/areas', methods=['GET'])
+def get_gym_areas(gym_id):
+    """Get all areas for a specific gym"""
     conn = get_db_connection()
-    query = '''
-        SELECT 
-            r.id, 
-            g.gymName, 
-            r.areaName, 
-            r.wallName, 
-            r.climbType, 
-            r.grade
-        FROM routes r
-        LEFT JOIN gyms g ON r.gym_id = g.id
-       ORDER BY r.grade, g.gymName, r.wallName
+    query = f'''
+    SELECT 
+        ga.id,
+        ga.areaName
+    FROM gym_areas ga
+    WHERE ga.gym_id = {gym_id}
     '''
-
-    routes = conn.execute(query).fetchall()
+    areas = conn.execute(query).fetchall()
     conn.close()
-    
-    return jsonify([dict(route) for route in routes])
+    return jsonify([dict(area) for area in areas])
 
-@app.route('/api/routes/locations/<int:gym_id>', methods=['GET'])
-def get_routes_by_gym(gym_id):
+@app.route('/api/gym/<int:gym_id>/walls')
+def get_gym_routes(gym_id):
     """Get all routes for a specific gym"""
     conn = get_db_connection()
-    routes = conn.execute(
-        '''
-        SELECT r.id, r.areaName, r.wallName, r.climbType, r.grade
-        FROM routes r
-        WHERE r.gym_id = ?
-        ORDER BY r.grade, r.wallName
-        ''',
-        (gym_id,)
-    ).fetchall()
+    query = f'''
+    SELECT 
+        w.id,
+        ga.areaName,
+        w.wallName,
+        w.climbType
+    FROM walls w
+    JOIN gym_areas ga ON w.gym_area_id = ga.id
+    WHERE w.gym_id = {gym_id}
+    '''
+    routes = conn.execute(query).fetchall()
     conn.close()
     return jsonify([dict(route) for route in routes])
 
-# Get scores
+#Gym Area Endpoints
+@app.route('/api/gym_areas', methods=['GET'])
+def get_all_gym_areas():
+    """Get all gym areas"""
+    conn = get_db_connection()
+    query = '''
+    SELECT 
+        ga.id,
+        g.gymName,
+        ga.areaName
+    FROM gym_areas ga 
+    JOIN gyms g ON ga.gym_id = g.id
+    ORDER BY areaName
+    '''
+    areas = conn.execute(query).fetchall()
+    conn.close()
+    return jsonify([dict(area) for area in areas])
+
+@app.route('/api/gym_area/<int:gym_area_id>/walls', methods=['GET'])
+def get_gym_area_walls(gym_area_id):
+    """Get all walls for a specific gym area"""
+    conn = get_db_connection()
+    query = '''
+    SELECT 
+        w.id,
+        w.wallName,
+        w.climbType
+    FROM walls w
+    WHERE w.gym_area_id = ?
+    '''
+    walls = conn.execute(query, (gym_area_id,)).fetchall()
+    conn.close()
+    return jsonify([dict(wall) for wall in walls])
+
+#Walls endpoints
+@app.route('/api/walls', methods=['GET'])
+def get_all_walls():
+    """Get all walls"""
+    conn = get_db_connection()
+    query = '''
+    SELECT 
+        w.id,
+        g.gymName,
+        ga.areaName,
+        w.wallName,
+        w.climbType
+    FROM walls w 
+    JOIN gym_areas ga ON w.gym_area_id = ga.id
+    JOIN gyms g ON ga.gym_id = g.id
+    ORDER BY wallName
+    '''
+    walls = conn.execute(query).fetchall()
+    conn.close()
+    return jsonify([dict(wall) for wall in walls])
+
+@app.route('/api/wall/<int:wall_id>/grades', methods=['GET'])
+def get_wall_grades(wall_id):
+    """Get available grades for a wall"""
+    conn = get_db_connection()
+    query = f'''
+    SELECT 
+        g.id as grade_id,
+        w.climbType,
+        g.grade
+    FROM walls w
+    JOIN grades g ON w.climbType = g.climbType
+    WHERE w.id = {wall_id}
+    ORDER BY g.id
+    '''
+    grades = conn.execute(query).fetchall()
+    conn.close()
+    return jsonify([dict(grade) for grade in grades])
+
+
+# Grade endpoints
+@app.route('/api/grades', methods=['GET'])
+def get_grades():
+    """Get all grades"""
+    conn = get_db_connection()
+    grades = conn.execute('SELECT * FROM grades ORDER BY climbType, grade').fetchall()
+    conn.close()
+    return jsonify([dict(grade) for grade in grades])
+
+# Score endpoints
 # Setup base query
 base_score_query = ''' 
 SELECT 
-    s.*, 
+    s.id,
+    s.climber_id,
+    s.wall_id,
+    w.gym_area_id,
+    ga.gym_id,
+    s.completed,
+    s.attempts,
+    s.notes,
+    s.date_recorded as dateRecorded, 
     c.name as climberName, 
-    g.gymName, 
-    r.wallName, 
-    r.grade
+    g.gymName,
+    ga.areaName as gymArea,
+    w.wallName, 
+    s.grade
 FROM scores s
 JOIN climbers c ON s.climber_id = c.id
-JOIN routes r ON s.route_id = r.id
-JOIN gyms g ON r.gym_id = g.id
+JOIN walls w ON s.wall_id = w.id
+JOIN gym_areas ga ON w.gym_area_id = ga.id
+JOIN gyms g ON ga.gym_id = g.id
 '''
 
 @app.route('/api/scores', methods=['GET'])
-def get_scores():
-    """Get all scores with climber and route info"""
+def get_all_scores():
+    """Get all scores with climber and wall info"""
     conn = get_db_connection()
     scores = conn.execute(f'''
         {base_score_query}
@@ -293,6 +402,20 @@ def get_climber_scores(climber_id):
         'scores': [dict(score) for score in scores]
     })
 
+@app.route('/api/scores/<int:score_id>', methods=['DELETE'])
+def delete_score(score_id):
+    """Delete a score"""
+    conn = get_db_connection()
+    
+    result = conn.execute('DELETE FROM scores WHERE id = ?', (score_id,))
+    conn.commit()
+    conn.close()
+    
+    if result.rowcount == 0:
+        return jsonify({'error': 'Score not found'}), 404
+    
+    return jsonify({'message': 'Score deleted successfully'})
+
 @app.route('/api/scores', methods=['POST'])
 def add_score():
     """Add a new score/attempt"""
@@ -313,20 +436,6 @@ def add_score():
     
     return jsonify({'message': 'Score recorded successfully'}), 201
 
-@app.route('/api/scores/<int:score_id>', methods=['DELETE'])
-def delete_score(score_id):
-    """Delete a score"""
-    conn = get_db_connection()
-    
-    result = conn.execute('DELETE FROM scores WHERE id = ?', (score_id,))
-    conn.commit()
-    conn.close()
-    
-    if result.rowcount == 0:
-        return jsonify({'error': 'Score not found'}), 404
-    
-    return jsonify({'message': 'Score deleted successfully'})
-
 # Error handlers
 @app.errorhandler(404)
 def not_found(error):
@@ -339,6 +448,8 @@ def internal_error(error):
 if __name__ == '__main__':
     # Initialize database on startup
     init_db()
+
+
     
     # Run the app
     app.run(debug=True, host='0.0.0.0', port=5001)

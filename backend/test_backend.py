@@ -19,7 +19,7 @@ def test_api_endpoints():
     print("2. Test endpoints with curl or a browser:")
     print("   - http://localhost:5001/api/stats")
     print("   - http://localhost:5001/api/climbers")
-    print("   - http://localhost:5001/api/routes")
+    print("   - http://localhost:5001/api/walls")
     print("   - http://localhost:5001/api/routes/locations")
     print("   - http://localhost:5001/api/scores")
     print("✅ API endpoint information provided!")

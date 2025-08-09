@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS gym_areas (
+  id INTEGER PRIMARY KEY,
+  gym_id INTEGER NOT NULL,
+  areaName TEXT NOT NULL,
+  FOREIGN KEY (gym_id) REFERENCES gyms (id)
+)

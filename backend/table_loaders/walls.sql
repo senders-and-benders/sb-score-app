@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS walls (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  gym_id INTEGER NOT NULL,
+  gym_area_id INTEGER NOT NULL,
+  wallName TEXT NOT NULL,
+  climbType TEXT NOT NULL,
+  date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (gym_id) REFERENCES gyms (id),
+  FOREIGN KEY (gym_area_id) REFERENCES gym_areas (id)
+)
