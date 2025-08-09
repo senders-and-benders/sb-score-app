@@ -114,29 +114,44 @@ const Scores = () => {
         {filteredScores.map(score => {
           const routeInfo = getRouteInfo(score);
           return (
-            <div key={score.id} className="card">
-              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <div>
-                  <h4>
-                    🧗‍♂️ {climberId ? '' : `${getClimberName(score.climber_id)} - `}{routeInfo.gymName} - {routeInfo.wallName}
-                    <span className="grade-badge" style={{marginLeft: '1rem'}}>
-                      {routeInfo.grade}
-                    </span>
-                  </h4>
-                  <p>
-                    {score.completed ? '✅ Completed' : '❌ Not completed'} 
-                    {' '} in {score.attempts} attempt{score.attempts !== 1 ? 's' : ''}
-                  </p>
-                  {score.notes && <p><em>"{score.notes}"</em></p>}
-                  <small>Recorded: {new Date(score.date_recorded).toLocaleDateString()}</small>
-                </div>
-                <button 
-                  className="btn btn-danger"
-                  onClick={() => handleDelete(score.id)}
-                >
-                  Delete
-                </button>
-              </div>
+            <div key={score.id} style={{ 
+              padding: '10px', 
+              margin: '10px 0', 
+              border: '1px solid #ddd', 
+              borderRadius: '4px',
+              position: 'relative'
+            }}>
+              <button
+                onClick={() => handleDelete(score.id)}
+                style={{
+                  position: 'absolute',
+                  top: '5px',
+                  right: '5px',
+                  background: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '24px',
+                  height: '24px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: '1'
+                }}
+                title="Delete score"
+              >
+                ×
+              </button>
+              <h4>🧗‍♂️ {climberId ? '' : `${getClimberName(score.climber_id)} - `}{routeInfo.gymName} - {score.gymAreaName} - {routeInfo.wallName}</h4>
+              <p>
+                {score.completed ? '✅ Completed' : '❌ Not completed'} 
+                {' '} in {score.attempts} attempt{score.attempts !== 1 ? 's' : ''}
+              </p>
+              <p><strong>Grade:</strong> {routeInfo.grade}</p>
+              {score.notes && <p><em>"{score.notes}"</em></p>}
+              <small>Recorded: {new Date(score.date_recorded).toLocaleDateString()}</small>
             </div>
           );
         })}

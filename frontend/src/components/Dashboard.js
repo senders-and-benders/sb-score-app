@@ -4,7 +4,7 @@ import axios from 'axios';
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalClimbers: 0,
-    totalRoutes: 0,
+    totalWalls: 0,
     totalAscents: 0
   });
   const [loading, setLoading] = useState(true);
@@ -36,7 +36,7 @@ const Dashboard = () => {
           <h3>📊 Statistics</h3>
           <div>
             <p><strong>Total Climbers:</strong> {stats.totalClimbers}</p>
-            <p><strong>Total Routes:</strong> {stats.totalRoutes}</p>
+            <p><strong>Total Routes:</strong> {stats.totalWalls}</p>
             <p><strong>Total Ascents:</strong> {stats.totalAscents}</p>
           </div>
         </div>

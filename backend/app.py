@@ -356,7 +356,7 @@ SELECT
     s.date_recorded as dateRecorded, 
     c.name as climberName, 
     g.gymName,
-    ga.areaName as gymArea,
+    ga.areaName as gymAreaName,
     w.wallName, 
     s.grade
 FROM scores s
@@ -421,15 +421,15 @@ def add_score():
     """Add a new score/attempt"""
     data = request.get_json()
     
-    required_fields = ['climber_id', 'route_id', 'completed', 'attempts']
+    required_fields = ['climber_id', 'wall_id', 'grade', 'completed', 'attempts']
     if not data or not all(field in data for field in required_fields):
         return jsonify({'error': 'Climber ID, route ID, completed status, and attempts are required'}), 400
     
     conn = get_db_connection()
     
     conn.execute(
-        'INSERT INTO scores (climber_id, route_id, completed, attempts, notes) VALUES (?, ?, ?, ?, ?)',
-        (data['climber_id'], data['route_id'], data['completed'], data['attempts'], data.get('notes', ''))
+        'INSERT INTO scores (climber_id, wall_id, grade, completed, attempts, notes) VALUES (?, ?, ?, ?, ?, ?)',
+        (data['climber_id'], data['wall_id'], data['grade'], data['completed'], data['attempts'], data.get('notes', ''))
     )
     conn.commit()
     conn.close()
