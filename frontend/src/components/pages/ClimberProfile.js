@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AscentCard from '../ui/AscentCard';
 
 const Scores = () => {
   const { climberId } = useParams();
@@ -56,19 +57,6 @@ const Scores = () => {
     }
   };
 
-  const getClimberName = (climberId) => {
-    // For individual scores, we get the climber name from the score data directly
-    return scores.find(s => s.climber_id === climberId)?.climberName || 'Unknown';
-  };
-
-  const getRouteInfo = (score) => {
-    return {
-      gymName: score.gymName || 'Unknown Gym',
-      wallName: score.wallName || 'Unknown Wall',
-      grade: score.grade || ''
-    };
-  };
-
   if (loading) return <div className="loading">Loading scores...</div>;
 
   // Filter scores if we're in self-scoring mode
@@ -104,59 +92,16 @@ const Scores = () => {
       
       {error && <div className="error">{error}</div>}
 
-      <div>
-        <h3>
-          {climberId && currentClimber 
-            ? `${currentClimber.name}'s Recent Scores` 
-            : 'Recent Scores'
-          }
-        </h3>
-        {filteredScores.map(score => {
-          const routeInfo = getRouteInfo(score);
-          return (
-            <div key={score.id} style={{ 
-              padding: '10px', 
-              margin: '10px 0', 
-              border: '1px solid #ddd', 
-              borderRadius: '4px',
-              position: 'relative'
-            }}>
-              <button
-                onClick={() => handleDelete(score.id)}
-                style={{
-                  position: 'absolute',
-                  top: '5px',
-                  right: '5px',
-                  background: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '24px',
-                  height: '24px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  lineHeight: '1'
-                }}
-                title="Delete score"
-              >
-                ×
-              </button>
-              <h4>🧗‍♂️ {climberId ? '' : `${getClimberName(score.climber_id)} - `}{routeInfo.gymName} - {score.gymAreaName} - {routeInfo.wallName}</h4>
-              <p>
-                {score.completed ? '✅ Completed' : '❌ Not completed'} 
-                {' '} in {score.attempts} attempt{score.attempts !== 1 ? 's' : ''}
-              </p>
-              <p><strong>Grade:</strong> {routeInfo.grade}</p>
-              {score.notes && <p><em>"{score.notes}"</em></p>}
-              <small>Recorded: {new Date(score.date_recorded).toLocaleDateString()}</small>
-            </div>
-          );
-        })}
+      <div className='card'>
+        {filteredScores.map(score => (
+          <AscentCard
+            score={score}
+            onDelete={handleDelete}
+            showClimberName={!!climberId}
+          />
+        ))}
       </div>
-      
+
       {filteredScores.length === 0 && (
         <div className="card">
           <p>

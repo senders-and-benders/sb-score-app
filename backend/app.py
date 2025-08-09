@@ -29,6 +29,17 @@ def get_initial_table_data(table_name):
         data_reader = csv.DictReader(data_file)
         return [row for row in data_reader]
 
+def get_view_script(view_name):
+    """Create database views"""
+    with open(f'./views/{view_name}.sql', 'r') as file:
+        query = file.read()
+    
+    create_view_query = f'''
+    CREATE VIEW IF NOT EXISTS {view_name} AS
+    {query};
+    '''
+    return create_view_query
+
 def init_db():
     """Initialize database with tables"""
     conn = get_db_connection()
@@ -133,6 +144,14 @@ def init_db():
                     score['notes']
                 )
             )
+
+    #Initiate and create all views
+    for root, _, files in os.walk('./views'):
+        for file in files:
+            if file.endswith('.sql'):
+                view_name = file.replace('.sql','')
+                conn.execute(f'DROP VIEW IF EXISTS {view_name}')
+                conn.execute(get_view_script(view_name))
 
     conn.commit()
     conn.close()
@@ -342,38 +361,11 @@ def get_grades():
     return jsonify([dict(grade) for grade in grades])
 
 # Score endpoints
-# Setup base query
-base_score_query = ''' 
-SELECT 
-    s.id,
-    s.climber_id,
-    s.wall_id,
-    w.gym_area_id,
-    ga.gym_id,
-    s.completed,
-    s.attempts,
-    s.notes,
-    s.date_recorded as dateRecorded, 
-    c.name as climberName, 
-    g.gymName,
-    ga.areaName as gymAreaName,
-    w.wallName, 
-    s.grade
-FROM scores s
-JOIN climbers c ON s.climber_id = c.id
-JOIN walls w ON s.wall_id = w.id
-JOIN gym_areas ga ON w.gym_area_id = ga.id
-JOIN gyms g ON ga.gym_id = g.id
-'''
-
 @app.route('/api/scores', methods=['GET'])
 def get_all_scores():
     """Get all scores with climber and wall info"""
     conn = get_db_connection()
-    scores = conn.execute(f'''
-        {base_score_query}
-        ORDER BY s.date_recorded DESC
-    ''').fetchall()
+    scores = conn.execute('SELECT * FROM vw_completed_climbs ORDER BY dateRecorded DESC').fetchall()
     conn.close()
     
     return jsonify([dict(score) for score in scores])
@@ -388,13 +380,11 @@ def get_climber_scores(climber_id):
     if not climber:
         conn.close()
         return jsonify({'error': 'Climber not found'}), 404
-    
-    scores = conn.execute(f'''
-        {base_score_query}
-        WHERE s.climber_id = {climber_id}
-        ORDER BY s.date_recorded DESC
-    ''').fetchall()
-    
+
+    scores = conn.execute('''
+        SELECT * FROM vw_completed_climbs WHERE climber_id = ? ORDER BY dateRecorded DESC
+        ''', (climber_id,)).fetchall()
+
     conn.close()
     
     return jsonify({

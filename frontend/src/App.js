@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Navigation from './components/Navigation';
-import Dashboard from './components/Dashboard';
-import Climbers from './components/Climbers';
-import SelfScoring from './components/SelfScoring';
-import Scores from './components/Scores';
+import Header from './components/pages/Header';
+import Navigation from './components/pages/Navigation';
+import Dashboard from './components/pages/Dashboard';
+import Climbers from './components/pages/Climbers';
+import SelfScoring from './components/pages/SelfScoring';
+import ClimberProfile from './components/pages/ClimberProfile';
 import './App.css';
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/climbers" element={<Climbers />} />
             <Route path="/self-scoring" element={<SelfScoring />} />
-            <Route path="/scores/:climberId" element={<Scores />} />
+            <Route path="/climber-profile/:climberId" element={<ClimberProfile />} />
           </Routes>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import AscentCard from '../ui/AscentCard';
 
 const SelfScoring = () => {
   const [step, setStep] = useState(1); // 1: Select climber, 2: Select all options & submit
@@ -535,54 +536,19 @@ const SelfScoring = () => {
             <h3>Your Recent Scores</h3>
             {scores.length > 0 ? (
               scores.slice(0, 5).map(score => (
-                <div key={score.id} style={{ 
-                  padding: '10px', 
-                  margin: '10px 0', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '4px',
-                  position: 'relative'
-                }}>
-                  <button
-                    onClick={() => handleDeleteScore(score.id)}
-                    style={{
-                      position: 'absolute',
-                      top: '5px',
-                      right: '5px',
-                      background: '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '24px',
-                      height: '24px',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      lineHeight: '1'
-                    }}
-                    title="Delete score"
-                  >
-                    ×
-                  </button>
-                  <h4>🧗‍♂️ {score.gymName} - {score.gymAreaName} - {score.wallName}</h4>
-                  <p>
-                    {score.completed ? '✅ Completed' : '❌ Not completed'} 
-                    {' '} in {score.attempts} attempt{score.attempts !== 1 ? 's' : ''}
-                  </p>
-                  <p><strong>Grade:</strong> {score.grade}</p>
-                  {score.notes && <p><em>"{score.notes}"</em></p>}
-                  <small>Recorded: {new Date(score.dateRecorded).toLocaleDateString()}</small>
-                </div>
+                <AscentCard  
+                  score={score} 
+                  onDelete={handleDeleteScore} 
+                />
               ))
             ) : (
               <p>No scores recorded yet. Submit your first climb above!</p>
             )}
-            
+
             {scores.length > 3 && (
-              <button 
+              <button
                 className="btn"
-                onClick={() => navigate(`/scores/${climberId}`)}
+                onClick={() => navigate(`/climber-profile/${climberId}`)}
                 style={{ marginTop: '10px' }}
               >
                 View All Scores ({scores.length})

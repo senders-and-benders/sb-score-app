@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Climbers = () => {
@@ -6,6 +7,8 @@ const Climbers = () => {
   const [newClimber, setNewClimber] = useState({ name: '', email: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchClimbers();
@@ -30,17 +33,6 @@ const Climbers = () => {
       fetchClimbers();
     } catch (err) {
       setError('Failed to add climber');
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this climber?')) {
-      try {
-        await axios.delete(`/api/climbers/${id}`);
-        fetchClimbers();
-      } catch (err) {
-        setError('Failed to delete climber');
-      }
     }
   };
 
@@ -77,25 +69,30 @@ const Climbers = () => {
         </form>
       </div>
 
-      <div className="climber-list">
-        {climbers.map(climber => (
-          <div key={climber.id} className="card">
-            <h3>🧗‍♂️ {climber.name}</h3>
-            <p>📧 {climber.email}</p>
-            <p>📊 Total Score: <span className="score-display">{climber.total_score || 0}</span></p>
-            <button 
-              className="btn btn-danger"
-              onClick={() => handleDelete(climber.id)}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+      <div className='card'>
+        <h3>Climber List</h3>
+        <i>Talk to admin to delete you as a climber.</i>
+        
+        <div className="climber-list">
+          {climbers.map(climber => (
+            <div key={climber.id} className="card">
+              <h3>🧗‍♂️ <i>{climber.name}</i></h3>
+              <p>📧 <i>{climber.email}</i></p>
+              <button 
+                className='btn'
+                onClick={() => navigate(`/climber-profile/${climber.id}`)}
+                style={{ fontSize: '0.9rem', padding: '0.3rem 0.8rem' }}
+              >
+                Profile
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
       
       {climbers.length === 0 && (
         <div className="card">
-          <p>No climbers found. Add some climbers to get started!</p>
+          <p><i>No climbers found. Add some climbers to get started!</i></p>
         </div>
       )}
     </div>
