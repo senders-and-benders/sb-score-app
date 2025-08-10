@@ -52,7 +52,7 @@ const Dashboard = () => {
       <div className="card">
         <h3>🏆 Recent Activity</h3>
         <p>Welcome to the Senders & Benders climbing app!</p>
-        <RecentActivityFeed />
+        <RecentActivityFeed maxItems={10} />
       </div>
         
     </div>

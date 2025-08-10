@@ -19,6 +19,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/climbers" element={<Climbers />} />
             <Route path="/self-scoring" element={<SelfScoring />} />
+            <Route path="/self-scoring/:climberId" element={<SelfScoring />} />
             <Route path="/climber-profile/:climberId" element={<ClimberProfile />} />
           </Routes>
         </div>

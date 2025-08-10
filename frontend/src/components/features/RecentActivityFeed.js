@@ -1,34 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const RecentActivityFeed = ({ maxItems = 20, scrollSpeed = 30 }) => {
+const RecentActivityFeed = ({ maxItems = 5 }) => {
   const [recentScores, setRecentScores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     fetchRecentActivity();
   }, []);
 
-  // Auto-scroll effect - slow continuous downward scroll
-  useEffect(() => {
-    if (recentScores.length > 0) {
-      const interval = setInterval(() => {
-        setScrollPosition(prev => {
-          const maxScroll = recentScores.length * 80; // Approximate height per item
-          return prev >= maxScroll ? 0 : prev + 1;
-        });
-      }, scrollSpeed);
-      return () => clearInterval(interval);
-    }
-  }, [recentScores.length, scrollSpeed]);
-
   const fetchRecentActivity = async () => {
     try {
       const response = await axios.get(`/api/scores?limit=${maxItems * 2}`);
       
-      // Filter for completed ascents in the last week
+      // Filter for completed ascents in the last week and get the 5 most recent
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
       
@@ -85,11 +71,7 @@ const RecentActivityFeed = ({ maxItems = 20, scrollSpeed = 30 }) => {
       <div style={{ 
         padding: '20px', 
         textAlign: 'center',
-        color: '#666',
-        height: '300px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
+        color: '#666'
       }}>
         Loading recent activity...
       </div>
@@ -101,11 +83,7 @@ const RecentActivityFeed = ({ maxItems = 20, scrollSpeed = 30 }) => {
       <div style={{ 
         padding: '20px', 
         textAlign: 'center',
-        color: '#dc3545',
-        height: '300px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
+        color: '#dc3545'
       }}>
         {error}
       </div>
@@ -117,12 +95,7 @@ const RecentActivityFeed = ({ maxItems = 20, scrollSpeed = 30 }) => {
       <div style={{ 
         padding: '20px', 
         textAlign: 'center',
-        color: '#666',
-        height: '300px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
+        color: '#666'
       }}>
         <p>No recent activity in the last week.</p>
         <p>Start climbing and recording your attempts!</p>
@@ -134,10 +107,7 @@ const RecentActivityFeed = ({ maxItems = 20, scrollSpeed = 30 }) => {
     <div style={{
       border: '1px solid #ddd',
       borderRadius: '8px',
-      backgroundColor: 'white',
-      height: '400px',
-      overflow: 'hidden',
-      position: 'relative'
+      backgroundColor: 'white'
     }}>
       {/* Header */}
       <div style={{
@@ -145,114 +115,87 @@ const RecentActivityFeed = ({ maxItems = 20, scrollSpeed = 30 }) => {
         backgroundColor: '#f8f9fa',
         borderBottom: '1px solid #eee',
         fontWeight: 'bold',
-        color: '#333',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
+        color: '#333'
       }}>
-        🏆 Recent Sends This Week ({recentScores.length})
+        🏆 Last {recentScores.length} Sends This Week
       </div>
 
-      {/* Scrolling feed container */}
-      <div style={{
-        height: '350px',
-        overflow: 'hidden',
-        position: 'relative'
-      }}>
-        <div style={{
-          transform: `translateY(-${scrollPosition}px)`,
-          transition: 'transform 0.1s linear',
-          padding: '8px'
-        }}>
-          {/* Duplicate the list to create seamless loop */}
-          {[...recentScores, ...recentScores].map((score, index) => {
-            const activity = formatActivityMessage(score);
-            const isOriginal = index < recentScores.length;
-            
-            return (
-              <div key={`${score.id}-${index}`} style={{
-                padding: '12px',
-                margin: '4px 0',
-                border: '1px solid #eee',
-                borderRadius: '6px',
-                backgroundColor: '#fafafa',
-                opacity: isOriginal ? 1 : 0.7
+      {/* Static list of recent activities */}
+      <div style={{ padding: '8px' }}>
+        {recentScores.map((score, index) => {
+          const activity = formatActivityMessage(score);
+          
+          return (
+            <div key={score.id} style={{
+              padding: '12px',
+              margin: '4px 0',
+              border: '1px solid #eee',
+              borderRadius: '6px',
+              backgroundColor: '#fafafa'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                marginBottom: '6px'
               }}>
                 <div style={{
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  marginBottom: '6px'
+                  alignItems: 'center',
+                  flex: 1
                 }}>
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flex: 1
-                  }}>
-                    <span style={{ fontSize: '14px', marginRight: '6px' }}>🧗‍♂️</span>
-                    <strong style={{ color: '#2196f3', fontSize: '13px', marginRight: '8px' }}>
-                      {activity.climber}
-                    </strong>
-                    <span style={{ 
-                      backgroundColor: '#e8f5e8', 
-                      padding: '2px 6px', 
-                      borderRadius: '8px',
-                      fontWeight: 'bold',
-                      fontSize: '11px',
-                      color: '#2e7d32'
-                    }}>
-                      {activity.grade}
-                    </span>
-                  </div>
+                  <span style={{ fontSize: '14px', marginRight: '6px' }}>🧗‍♂️</span>
+                  <strong style={{ color: '#2196f3', fontSize: '13px', marginRight: '8px' }}>
+                    {activity.climber}
+                  </strong>
                   <span style={{ 
-                    fontSize: '10px', 
-                    color: '#999',
-                    whiteSpace: 'nowrap' 
+                    backgroundColor: '#e8f5e8', 
+                    padding: '2px 6px', 
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '11px',
+                    color: '#2e7d32'
                   }}>
-                    {activity.timeAgo}
+                    {activity.grade}
                   </span>
                 </div>
-                
-                <p style={{ 
-                  fontSize: '11px', 
-                  color: '#666',
-                  margin: '4px 0',
-                  lineHeight: '1.3'
+                <span style={{ 
+                  fontSize: '10px', 
+                  color: '#999',
+                  whiteSpace: 'nowrap' 
                 }}>
-                  📍 {activity.route}
-                </p>
-                
-                <div style={{
-                  fontSize: '10px',
-                  color: '#999'
-                }}>
-                  {activity.attempts} attempt{activity.attempts !== 1 ? 's' : ''}
-                  {activity.notes && (
-                    <span style={{ 
-                      marginLeft: '8px',
-                      fontStyle: 'italic',
-                      color: '#666'
-                    }}>
-                      • "{activity.notes.length > 40 ? activity.notes.substring(0, 40) + '...' : activity.notes}"
-                    </span>
-                  )}
-                </div>
+                  {activity.timeAgo}
+                </span>
               </div>
-            );
-          })}
-        </div>
+              
+              <p style={{ 
+                fontSize: '11px', 
+                color: '#666',
+                margin: '4px 0',
+                lineHeight: '1.3'
+              }}>
+                📍 {activity.route}
+              </p>
+              
+              <div style={{
+                fontSize: '10px',
+                color: '#999'
+              }}>
+                {activity.attempts} attempt{activity.attempts !== 1 ? 's' : ''}
+                {activity.notes && (
+                  <span style={{ 
+                    marginLeft: '8px',
+                    fontStyle: 'italic',
+                    color: '#666'
+                  }}>
+                    • "{activity.notes.length > 40 ? activity.notes.substring(0, 40) + '...' : activity.notes}"
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
-
-      {/* Gradient fade at bottom */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: '30px',
-        background: 'linear-gradient(transparent, white)',
-        pointerEvents: 'none'
-      }} />
     </div>
   );
 };

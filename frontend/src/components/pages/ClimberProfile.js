@@ -80,7 +80,7 @@ const Scores = () => {
             <span style={{ marginLeft: '1rem' }}>
               <button 
                 className="btn" 
-                onClick={() => navigate('/self-scoring')}
+                onClick={() => navigate(`/self-scoring/${climberId}`)}
                 style={{ fontSize: '0.9rem', padding: '0.3rem 0.8rem' }}
               >
                 Back to Self Scoring

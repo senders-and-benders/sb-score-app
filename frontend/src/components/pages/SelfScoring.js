@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import AscentCard from '../ui/AscentCard';
 
 const SelfScoring = () => {
+  const { climberId: urlClimberId } = useParams(); // Get climber ID from URL
   const [step, setStep] = useState(1); // 1: Select climber, 2: Select all options & submit
-  const [climberId, setClimberId] = useState('');
+  const [climberId, setClimberId] = useState(urlClimberId || '');
   const [currentClimber, setCurrentClimber] = useState(null);
   const [climbers, setClimbers] = useState([]);
   const [gyms, setGyms] = useState([]);
@@ -38,6 +39,18 @@ const SelfScoring = () => {
       fetchClimberScores(climberId);
     }
   }, [climberId]);
+
+  // Handle URL climber ID parameter
+  useEffect(() => {
+    if (urlClimberId && climbers.length > 0) {
+      const climber = climbers.find(c => c.id === parseInt(urlClimberId));
+      if (climber) {
+        setClimberId(urlClimberId);
+        setCurrentClimber(climber);
+        setStep(2);
+      }
+    }
+  }, [urlClimberId, climbers]);
 
   const fetchInitialData = async () => {
     try {
@@ -154,7 +167,6 @@ const SelfScoring = () => {
       setStep(2);
       setSelections(prev => ({
         ...prev,
-        wall_id: '',
         climb_type: '',
         grade: ''
       }));
@@ -184,6 +196,12 @@ const SelfScoring = () => {
   };
 
   const resetToClimberSelection = () => {
+    // If we came from a parameterized route, navigate to base route
+    if (urlClimberId) {
+      navigate('/self-scoring');
+      return;
+    }
+    
     setStep(1);
     setClimberId('');
     setCurrentClimber(null);
