@@ -29,6 +29,7 @@ jobs:
         run: npm run build
 
       - name: Copy Build Artifacts
+        working-directory: frontend
         run: |
           mkdir -p ../backend/build
           cp -r frontend/build/* backend/build
