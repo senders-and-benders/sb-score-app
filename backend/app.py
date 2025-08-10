@@ -1,11 +1,11 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import sqlite3
 import os
 from datetime import datetime
 import csv
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='build', static_url_path='')
 CORS(app)
 
 # Database configuration
@@ -350,7 +350,6 @@ def get_wall_grades(wall_id):
     conn.close()
     return jsonify([dict(grade) for grade in grades])
 
-
 # Grade endpoints
 @app.route('/api/grades', methods=['GET'])
 def get_grades():
@@ -426,6 +425,18 @@ def add_score():
     
     return jsonify({'message': 'Score recorded successfully'}), 201
 
+
+# Serve React app for all other routes
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react(path):
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        # For SPA routes, always serve index.html
+        return send_from_directory(app.static_folder, 'index.html')
+
+
 # Error handlers
 @app.errorhandler(404)
 def not_found(error):
@@ -439,7 +450,5 @@ if __name__ == '__main__':
     # Initialize database on startup
     init_db()
 
-
-    
     # Run the app
     app.run(debug=True, host='0.0.0.0', port=5001)
