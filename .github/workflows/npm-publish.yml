@@ -14,27 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install React App
-        run: |
-          cd frontend
-          npm install
 
-  publish-npm:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-      - name: Publish Reach App
+          node-version: 22
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build React App
+        working-directory: frontend
+        run: npm run build
+
+      - name: Copy Build Artifacts
         run: |
-          cd frontend
-          npm run build
-          cd ../
+          mkdir -p ../backend/build
           cp -r frontend/build/* backend/build
-          
