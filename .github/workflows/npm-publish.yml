@@ -33,7 +33,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Publish Reach App
         run: |
-          ls 
+          cd frontend
           npm run build
           cd ../
           cp -r frontend/build/* backend/build
