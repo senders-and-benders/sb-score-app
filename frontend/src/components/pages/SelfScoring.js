@@ -223,28 +223,6 @@ const SelfScoring = () => {
     setScores([]);
   };
 
-  const goBackStep = () => {
-    setStep(1);
-    setClimberId('');
-    setCurrentClimber(null);
-    setSelections({
-      gym_id: '',
-      gym_area_id: '',
-      wall_id: '',
-      climb_type: '',
-      grade: ''
-    });
-    setScoreDetails({
-      completed: true,
-      attempts: 1,
-      notes: ''
-    });
-    setGymAreas([]);
-    setWalls([]);
-    setGrades([]);
-    setScores([]);
-  };
-
   const getCurrentStepTitle = () => {
     switch (step) {
       case 1: return 'Select Climber';

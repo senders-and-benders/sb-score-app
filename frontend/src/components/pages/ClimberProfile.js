@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AscentCard from '../ui/AscentCard';
@@ -11,15 +11,7 @@ const Scores = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (climberId) {
-      fetchClimberScores();
-    } else {
-      fetchData();
-    }
-  }, [climberId]);
-
-  const fetchClimberScores = async () => {
+  const fetchClimberScores = useCallback(async () => {
     try {
       const response = await axios.get(`/api/scores/climber/${climberId}`);
       setCurrentClimber(response.data.climber);
@@ -29,9 +21,9 @@ const Scores = () => {
       setError('Failed to load climber scores');
       setLoading(false);
     }
-  };
+  }, [climberId]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const scoresRes = await axios.get('/api/scores');
       setScores(scoresRes.data);
@@ -40,7 +32,15 @@ const Scores = () => {
       setError('Failed to load data');
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (climberId) {
+      fetchClimberScores();
+    } else {
+      fetchData();
+    }
+  }, [climberId, fetchClimberScores, fetchData]);
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this score?')) {

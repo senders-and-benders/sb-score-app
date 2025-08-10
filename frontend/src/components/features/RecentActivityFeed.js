@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const RecentActivityFeed = ({ maxItems = 5 }) => {
@@ -6,11 +6,7 @@ const RecentActivityFeed = ({ maxItems = 5 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchRecentActivity();
-  }, []);
-
-  const fetchRecentActivity = async () => {
+  const fetchRecentActivity = useCallback(async () => {
     try {
       const response = await axios.get(`/api/scores?limit=${maxItems * 2}`);
       
@@ -32,7 +28,11 @@ const RecentActivityFeed = ({ maxItems = 5 }) => {
       setError('Failed to load recent activity');
       setLoading(false);
     }
-  };
+  }, [maxItems]);
+
+  useEffect(() => {
+    fetchRecentActivity();
+  }, [fetchRecentActivity]);
 
   const formatActivityMessage = (score) => {
     const climberName = score.climber_name || score.climberName || `Climber ${score.climber_id}`;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -10,11 +10,7 @@ const Climbers = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchClimbers();
-  }, []);
-
-  const fetchClimbers = async () => {
+  const fetchClimbers = useCallback(async () => {
     try {
       const response = await axios.get('/api/climbers');
       setClimbers(response.data);
@@ -23,7 +19,11 @@ const Climbers = () => {
       setError('Failed to load climbers');
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchClimbers();
+  }, [fetchClimbers]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
