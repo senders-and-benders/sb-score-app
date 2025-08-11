@@ -32,4 +32,7 @@ jobs:
         working-directory: frontend
         run: |
           mkdir -p ../backend/build
-          cp -r build/* ../backend/build
+          cp -r build/* ../backend/build/
+          echo "Check if files have been copied"
+          cd ../backend/build
+          ls -la
