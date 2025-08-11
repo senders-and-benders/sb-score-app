@@ -34,5 +34,7 @@ jobs:
           mkdir -p ../backend/build
           cp -r build/* ../backend/build/
           echo "Check if files have been copied"
-          cd ../backend/build
+          cd ../backend
+          ls -la
+          cd build
           ls -la
