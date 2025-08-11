@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS grades (
+  id SERIAL PRIMARY KEY,
+  climb_type VARCHAR(50) NOT NULL,
+  grade VARCHAR(50) NOT NULL
+)

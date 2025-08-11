@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS scores (
+  id SERIAL PRIMARY KEY,
+  climber_id INTEGER NOT NULL,
+  wall_id INTEGER NOT NULL,
+  grade VARCHAR(50) NOT NULL,
+  completed BOOLEAN NOT NULL DEFAULT FALSE,
+  attempts INTEGER NOT NULL DEFAULT 1,
+  notes TEXT,
+  date_recorded TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (climber_id) REFERENCES climbers (id),
+  FOREIGN KEY (wall_id) REFERENCES walls (id)
+)
