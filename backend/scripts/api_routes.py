@@ -1,7 +1,6 @@
 
 from flask import Blueprint, jsonify, request
 from scripts.postgres_utils import create_connection_and_query, execute_query
-from psycopg2 import IntegrityError
 
 # Create a Blueprint for routes
 routes_blueprint = Blueprint('routes', __name__)
