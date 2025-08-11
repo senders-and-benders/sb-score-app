@@ -60,5 +60,5 @@ Thumbs.db
 .env.production.local
 
 # Others
-setup/*
-backend/build/*
+setup
+backend/build
