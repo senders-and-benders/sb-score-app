@@ -69,6 +69,7 @@ def insert_data_from_csv(conn, table_name):
             #Execute
             row_count = execute_query(cursor, query, params=params)
         
+        print(f'Inserted {len(data)} rows into {table_name}')
         #Commit changes
         conn.commit()
 

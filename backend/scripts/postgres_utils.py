@@ -31,9 +31,11 @@ def get_db_connection():
     # Parse the database URL for psycopg2
     parsed = urllib.parse.urlparse(database_url)
     
+    dB_name = os.getenv('APP_DB', parsed.path[1:])  # Use environment variable is availble if not, use DB URL
+
     conn = psycopg2.connect(
         host=parsed.hostname,
-        database=parsed.path[1:],  # Remove leading slash
+        database=dB_name, # Switch based on environment variable
         user=parsed.username,
         password=parsed.password,
         port=parsed.port or 5432
@@ -63,8 +65,6 @@ def execute_query(cursor, query, params=None, fetch_one=False, fetch_all=False):
         result = cursor.fetchall()
     else:
         result = cursor.rowcount
-        print('Not counting')
-        print(result)
           
     return result
 
