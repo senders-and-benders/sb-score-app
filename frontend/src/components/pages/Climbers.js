@@ -84,7 +84,7 @@ const Climbers = () => {
         <div className="climber-list">
           {climbers.map(climber => (
             <div key={climber.id} className="card">
-              <h3>🧗‍♂️ <i>{climber.name})</i></h3>
+              <h3>🧗‍♂️ <i>{climber.name}</i></h3>
               <p><i>Nickname: {climber.nickname}</i></p>
               <button 
                 className='btn'

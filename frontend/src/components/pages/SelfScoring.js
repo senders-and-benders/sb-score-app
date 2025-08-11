@@ -20,7 +20,6 @@ const SelfScoring = () => {
     gym_id: '',
     gym_area_id: '',
     wall_id: '',
-    climb_type: '',
     grade: ''
   });
   const [scoreDetails, setScoreDetails] = useState({
@@ -111,7 +110,7 @@ const SelfScoring = () => {
   };
 
   const handleGymSelect = (gymId) => {
-    setSelections(prev => ({ ...prev, gym_id: gymId, gym_area_id: '', wall_id: '', climb_type: '', grade: '' }));
+    setSelections(prev => ({ ...prev, gym_id: gymId, gym_area_id: '', wall_id: '', grade: '' }));
     setGymAreas([]);
     setWalls([]);
     setGrades([]);
@@ -121,7 +120,7 @@ const SelfScoring = () => {
   };
 
   const handleAreaSelect = (areaId) => {
-    setSelections(prev => ({ ...prev, gym_area_id: areaId, wall_id: '', climb_type: '', grade: '' }));
+    setSelections(prev => ({ ...prev, gym_area_id: areaId, wall_id: '', grade: '' }));
     setWalls([]);
     setGrades([]);
     if (areaId) {
@@ -133,7 +132,6 @@ const SelfScoring = () => {
     setSelections(prev => ({ 
       ...prev, 
       wall_id: wallId, 
-      climb_type: climbType || '',
       grade: '' 
     }));
     setGrades([]);
@@ -154,7 +152,6 @@ const SelfScoring = () => {
         gym_id: parseInt(selections.gym_id),
         gym_area_id: parseInt(selections.gym_area_id),
         wall_id: parseInt(selections.wall_id),
-        climb_type: selections.climb_type,
         grade: selections.grade,
         completed: scoreDetails.completed,
         attempts: scoreDetails.attempts,
@@ -167,7 +164,6 @@ const SelfScoring = () => {
       setStep(2);
       setSelections(prev => ({
         ...prev,
-        climb_type: '',
         grade: ''
       }));
       setScoreDetails({
@@ -209,7 +205,6 @@ const SelfScoring = () => {
       gym_id: '',
       gym_area_id: '',
       wall_id: '',
-      climb_type: '',
       grade: ''
     });
     setScoreDetails({
@@ -435,7 +430,7 @@ const SelfScoring = () => {
             {/* Grade Selection */}
             {selections.wall_id && (
               <div style={{ marginTop: '2rem' }}>
-                <h4>Select Grade for {getSelectedWallName()} ({selections.climb_type}):</h4>
+                <h4>Select Grade for {getSelectedWallName()}:</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', marginTop: '1rem' }}>
                   {grades.map(grade => (
                     <button
@@ -464,7 +459,7 @@ const SelfScoring = () => {
                 <form onSubmit={handleScoreSubmit}>
                   <div style={{ backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: '4px', marginBottom: '1rem' }}>
                     <strong>Selected Route:</strong><br />
-                    {getSelectedGymName()} → {getSelectedAreaName()} → {getSelectedWallName()} → {selections.grade} ({selections.climb_type})
+                    {getSelectedGymName()} → {getSelectedAreaName()} → {getSelectedWallName()} → {selections.grade}
                   </div>
 
                   <div className="form-group">
@@ -503,7 +498,6 @@ const SelfScoring = () => {
                     gym_id: '',
                     gym_area_id: '',
                     wall_id: '',
-                    climb_type: '',
                     grade: ''
                   });
                   setScoreDetails({

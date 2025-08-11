@@ -7,20 +7,20 @@ from init_db import init_db
 from scripts.api_routes import routes_blueprint
 
 #Initiate app variable and set routes defined elsewhere
-app = Flask(__name__, static_folder='build', static_url_path='')
+app = Flask(__name__, static_folder='build', static_url_path='/')
 app.register_blueprint(routes_blueprint)
 CORS(app)
+
+# Serve static files
+@app.route('/<path:path>')
+def static_files(path):
+    return send_from_directory(app.static_folder, path)
 
 # Serve React app for all other routes
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-def serve_react(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        # For SPA routes, always serve index.html
-        return send_from_directory(app.static_folder, 'index.html')
-
+def catch_all(path):
+    return send_from_directory(app.static_folder, 'index.html')
 
 if __name__ == '__main__':
     # Initialize database on startup

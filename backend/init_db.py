@@ -82,8 +82,8 @@ def init_db():
             print(f'Creating {table_name}...')
             create_table_from_sql(conn, table_name)
 
+        print(f'Inserting Data into tables...')
         for table_name in tables:
-            print(f'Inserting initial data into {table_name}...')
             insert_data_from_csv(conn, table_name)
 
         #Initiate and create all views
@@ -95,3 +95,8 @@ def init_db():
         raise e
     finally:
         conn.close()
+
+if __name__ == '__main__':
+    print('Initialising database...')
+    init_db()
+    print('Database initialised successfully.')
