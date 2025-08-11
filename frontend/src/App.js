@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/pages/Header';
-import Navigation from './components/pages/Navigation';
-import Dashboard from './components/pages/Dashboard';
-import Climbers from './components/pages/Climbers';
-import SelfScoring from './components/pages/SelfScoring';
-import ClimberProfile from './components/pages/ClimberProfile';
+import Header from './components/ui/Header';
+import Navigation from './components/ui/Navigation';
+import Dashboard from './pages/Dashboard';
+import Climbers from './pages/Climbers';
+import SelfScoring from './pages/SelfScoring';
+import ClimberProfile from './pages/ClimberProfile';
+import PageNotFound from './pages/PageNotFound';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route path="/self-scoring" element={<SelfScoring />} />
             <Route path="/self-scoring/:climberId" element={<SelfScoring />} />
             <Route path="/climber-profile/:climberId" element={<ClimberProfile />} />
+            <Route path="*" element={<PageNotFound />} />
           </Routes>
         </div>
       </div>

@@ -250,12 +250,3 @@ def add_score():
     create_connection_and_query(query, params=params)
 
     return jsonify({'message': 'Score recorded successfully'}), 201
-
-# Error handlers
-@routes_blueprint.errorhandler(404)
-def not_found(error):
-    return jsonify({'error': 'Not found'}), 404
-
-@routes_blueprint.errorhandler(500)
-def internal_error(error):
-    return jsonify({'error': 'Internal server error'}), 500

@@ -1,5 +1,6 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
+
 import os
 
 # Script specific
@@ -11,16 +12,20 @@ app = Flask(__name__, static_folder='build', static_url_path='/')
 app.register_blueprint(routes_blueprint)
 CORS(app)
 
-# Serve static files
-@app.route('/<path:path>')
-def static_files(path):
-    return send_from_directory(app.static_folder, path)
+# Handle top level routes
+#Serve index
+@app.route('/')
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
 
 # Serve React app for all other routes
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
+@app.errorhandler(404)
+def catch_all(error):
     return send_from_directory(app.static_folder, 'index.html')
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
     # Initialize database on startup
