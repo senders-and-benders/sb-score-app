@@ -24,39 +24,46 @@ code {
   color: white;
   padding: 1rem;
   text-align: center;
-  margin-bottom: 2rem;
   font-family: "Montserrat", sans-serif;
 }
 
 .header-text {
   font-weight: 300;
 }
-
 .nav {
-  background-color: #34495e;
+  background-color: #f5f5f5;
   padding: 1rem;
   margin-bottom: 2rem;
+  font-family: "Montserrat", sans-serif;
 }
 
 .nav ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
+  padding: 5px;
   display: flex;
-  gap: 2rem;
 }
 
 .nav a {
-  color: white;
+  color: rgb(0, 0, 0);
   text-decoration: none;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  position: relative;
+  transition: color 0.3s;
 }
 
-.nav a:hover,
-.nav a.active {
-  background-color: #2c3e50;
+.nav a:hover::after,
+.nav a.active::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background-color: #18324f;
+  border-radius: 2px;
 }
 
 .card {

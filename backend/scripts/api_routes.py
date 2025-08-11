@@ -24,12 +24,15 @@ def get_stats():
 def get_climbers():
     """Get all climbers with their scores"""
     climbers = create_connection_and_query('''
-        SELECT c.*, 
-               COALESCE(SUM(CASE WHEN s.completed = TRUE THEN 1 ELSE 0 END), 0) as total_score
+        SELECT 
+            c.id,
+            c.name,
+            c.nickname,
+            c.date_created
         FROM climbers c
         LEFT JOIN scores s ON c.id = s.climber_id
         GROUP BY c.id, c.name, c.nickname, c.date_created
-        ORDER BY total_score DESC, c.name
+        ORDER BY c.name
     ''', fetch_all=True)
     
     return jsonify([dict(climber) for climber in climbers])

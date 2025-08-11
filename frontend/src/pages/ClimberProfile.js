@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import AscentCard from '../components/ui/AscentCard';
+import AscentCard from '../components/AscentCard';
 
 const Scores = () => {
   const { climberId } = useParams();

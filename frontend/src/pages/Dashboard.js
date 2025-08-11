@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import RecentActivityFeed from '../components/features/RecentActivityFeed'
+import RecentActivityFeed from '../components/RecentActivityFeed'
 
 const Dashboard = () => {
   const [stats, setStats] = useState({

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import AscentCard from '../components/ui/AscentCard';
+import AscentCard from '../components/AscentCard';
 
 const SelfScoring = () => {
   const { climberId: urlClimberId } = useParams(); // Get climber ID from URL
@@ -277,33 +277,7 @@ const SelfScoring = () => {
       {step === 1 && (
         <>
           <div className="card">
-            <h3>Enter Your Climber ID</h3>
-            <p>Select your name from the list below or enter your climber ID to start scoring.</p>
-            
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              if (climberId) {
-                handleClimberSelect(climberId);
-              }
-            }}>
-              <div className="form-group">
-                <label>Climber ID:</label>
-                <input
-                  type="text"
-                  value={climberId}
-                  onChange={(e) => setClimberId(e.target.value)}
-                  placeholder="Enter your climber ID"
-                  required
-                />
-              </div>
-              <button type="submit" className="btn">
-                Continue to Scoring
-              </button>
-            </form>
-          </div>
-
-          <div className="card">
-            <h3>Or Select Your Name</h3>
+            <h3>Select Your Name</h3>
             <div className="climber-selection">
               {climbers.map(climber => (
                 <div 
@@ -321,7 +295,7 @@ const SelfScoring = () => {
                 >
                   <strong>{climber.name}</strong>
                   <span style={{ color: '#666', marginLeft: '10px' }}>
-                    ID: {climber.id}
+                    <small>({climber.nickname})</small>
                   </span>
                 </div>
               ))}
