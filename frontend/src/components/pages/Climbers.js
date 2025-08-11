@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const Climbers = () => {
   const [climbers, setClimbers] = useState([]);
-  const [newClimber, setNewClimber] = useState({ name: '', email: '' });
+  const [newClimber, setNewClimber] = useState({ name: '', email: '', nickname: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,7 +29,7 @@ const Climbers = () => {
     e.preventDefault();
     try {
       await axios.post('/api/climbers', newClimber);
-      setNewClimber({ name: '', email: '' });
+      setNewClimber({ name: '', email: '' , nickname: '' });
       fetchClimbers();
     } catch (err) {
       setError('Failed to add climber');
@@ -48,7 +48,7 @@ const Climbers = () => {
         <h3>Add New Climber</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Name:</label>
+            <label>Name (required):</label>
             <input
               type="text"
               value={newClimber.name}
@@ -57,12 +57,20 @@ const Climbers = () => {
             />
           </div>
           <div className="form-group">
-            <label>Email:</label>
+            <label>Email (required):</label>
             <input
               type="email"
               value={newClimber.email}
               onChange={(e) => setNewClimber({...newClimber, email: e.target.value})}
               required
+            />
+          </div>
+          <div className="form-group">
+            <label>Nickname (optional):</label>
+            <input
+              type="text"
+              value={newClimber.nickname}
+              onChange={(e) => setNewClimber({...newClimber, nickname: e.target.value})}
             />
           </div>
           <button type="submit" className="btn">Add Climber</button>
@@ -76,8 +84,8 @@ const Climbers = () => {
         <div className="climber-list">
           {climbers.map(climber => (
             <div key={climber.id} className="card">
-              <h3>🧗‍♂️ <i>{climber.name}</i></h3>
-              <p>📧 <i>{climber.email}</i></p>
+              <h3>🧗‍♂️ <i>{climber.name})</i></h3>
+              <p><i>Nickname: {climber.nickname}</i></p>
               <button 
                 className='btn'
                 onClick={() => navigate(`/climber-profile/${climber.id}`)}

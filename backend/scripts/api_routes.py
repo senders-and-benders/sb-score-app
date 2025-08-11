@@ -24,12 +24,12 @@ def get_stats():
 @routes_blueprint.route('/api/climbers', methods=['GET'])
 def get_climbers():
     """Get all climbers with their scores"""
-    climbers = create_connection_and_query(f'''
+    climbers = create_connection_and_query('''
         SELECT c.*, 
                COALESCE(SUM(CASE WHEN s.completed = TRUE THEN 1 ELSE 0 END), 0) as total_score
         FROM climbers c
         LEFT JOIN scores s ON c.id = s.climber_id
-        GROUP BY c.id, c.name, c.email, c.date_created
+        GROUP BY c.id, c.name, c.nickname, c.date_created
         ORDER BY total_score DESC, c.name
     ''', fetch_all=True)
     
@@ -39,26 +39,28 @@ def get_climbers():
 def add_climber():
     """Add a new climber"""
     data = request.get_json()
-    
+
     if not data or 'name' not in data or 'email' not in data:
         return jsonify({'error': 'Name and email are required'}), 400
-    
-    try:
-        create_connection_and_query(
-            f'INSERT INTO climbers (name, email) VALUES ({data['name']}, {data['email']})'
-        )
-        return jsonify({'message': 'Climber added successfully'}), 201
-    except IntegrityError:
-        return jsonify({'error': 'Email already exists'}), 400
+
+    if 'nickname' in data and data['nickname']:
+        query = 'INSERT INTO climbers (name, email, nickname) VALUES (%s, %s, %s)'
+        params = (data['name'], data['email'], data['nickname'])
+    else:
+        query = 'INSERT INTO climbers (name, email) VALUES (%s, %s)'
+        params = (data['name'], data['email'])
+
+    create_connection_and_query(query, params=params)
+    return jsonify({'message': 'Climber added successfully'}), 201
 
 @routes_blueprint.route('/api/climbers/<int:climber_id>', methods=['DELETE'])
 def delete_climber(climber_id):
     """Delete a climber"""
     # First delete all scores for this climber
-    create_connection_and_query(f'DELETE FROM scores WHERE climber_id = {climber_id}')
+    create_connection_and_query('DELETE FROM scores WHERE climber_id = %s', params=(climber_id,))
 
     # Then delete the climber
-    result = create_connection_and_query(f'DELETE FROM climbers WHERE id = {climber_id}')
+    result = create_connection_and_query('DELETE FROM climbers WHERE id = %s', params=(climber_id,))
     
     if result.rowcount == 0:
         return jsonify({'error': 'Climber not found'}), 404
@@ -75,20 +77,21 @@ def get_all_gyms():
 @routes_blueprint.route('/api/gym/<int:gym_id>/areas', methods=['GET'])
 def get_gym_areas(gym_id):
     """Get all areas for a specific gym"""
-    query = f'''
+    query = '''
     SELECT 
         ga.id,
         ga.name
     FROM gym_areas ga
-    WHERE ga.gym_id = {gym_id}
+    WHERE ga.gym_id = %s
     '''
-    areas = create_connection_and_query(query, fetch_all=True)
+    params = (gym_id,)
+    areas = create_connection_and_query(query, params=params, fetch_all=True)
     return jsonify([dict(area) for area in areas])
 
 @routes_blueprint.route('/api/gym/<int:gym_id>/walls')
 def get_gym_routes(gym_id):
     """Get all routes for a specific gym"""
-    query = f'''
+    query = '''
     SELECT 
         w.id,
         ga.name as gym_area_name,
@@ -96,9 +99,10 @@ def get_gym_routes(gym_id):
         w.climb_type
     FROM walls w
     JOIN gym_areas ga ON w.gym_area_id = ga.id
-    WHERE w.gym_id = {gym_id}
+    WHERE w.gym_id = %s
     '''
-    routes = create_connection_and_query(query, fetch_all=True)
+    params = (gym_id,)
+    routes = create_connection_and_query(query, params=params, fetch_all=True)
     return jsonify([dict(route) for route in routes])
 
 #Gym Area Endpoints
@@ -120,15 +124,16 @@ def get_all_gym_areas():
 @routes_blueprint.route('/api/gym_area/<int:gym_area_id>/walls', methods=['GET'])
 def get_gym_area_walls(gym_area_id):
     """Get all walls for a specific gym area"""
-    query = f'''
+    query = '''
     SELECT 
         w.id,
         w.name,
         w.climb_type
     FROM walls w
-    WHERE w.gym_area_id = {gym_area_id}
+    WHERE w.gym_area_id = %s
     '''
-    walls = create_connection_and_query(query, fetch_all=True)
+    params = (gym_area_id,)
+    walls = create_connection_and_query(query, params=params, fetch_all=True)
     return jsonify([dict(wall) for wall in walls])
 
 #Walls endpoints
@@ -153,7 +158,7 @@ def get_all_walls():
 @routes_blueprint.route('/api/wall/<int:wall_id>/grades', methods=['GET'])
 def get_wall_grades(wall_id):
     """Get available grades for a wall"""
-    query = f'''
+    query = '''
     SELECT 
         g.id,
         w.name as wall_name,
@@ -161,10 +166,11 @@ def get_wall_grades(wall_id):
         g.grade
     FROM walls w
     JOIN grades g ON w.climb_type = g.climb_type
-    WHERE w.id = {wall_id}
+    WHERE w.id = %s
     ORDER BY g.id
     '''
-    grades = create_connection_and_query(query, fetch_all=True)
+    params = (wall_id,)
+    grades = create_connection_and_query(query, params=params, fetch_all=True)
     return jsonify([dict(grade) for grade in grades])
 
 # Grade endpoints
@@ -190,17 +196,18 @@ def get_all_scores():
 @routes_blueprint.route('/api/scores/climber/<int:climber_id>', methods=['GET'])
 def get_climber_scores(climber_id):
     """Get scores for a specific climber"""
-    query = f'''
-    SELECT * FROM climbers WHERE id = {climber_id}
+    query = '''
+    SELECT * FROM climbers WHERE id = %s
     '''
-    climber = create_connection_and_query(query, fetch_one=True)
+    params = (climber_id,)
+    climber = create_connection_and_query(query, params=params, fetch_one=True)
     if not climber:
         return jsonify({'error': 'Climber not found'}), 404
 
-    query = f'''
-        SELECT * FROM vw_completed_climbs WHERE climber_id = {climber_id} ORDER BY date_recorded DESC
+    query = '''
+        SELECT * FROM vw_completed_climbs WHERE climber_id = %s ORDER BY date_recorded DESC
     '''
-    scores = create_connection_and_query(query, fetch_all=True)
+    scores = create_connection_and_query(query, params=params, fetch_all=True)
 
     return jsonify({
         'climber': dict(climber),
@@ -210,12 +217,14 @@ def get_climber_scores(climber_id):
 @routes_blueprint.route('/api/scores/<int:score_id>', methods=['DELETE'])
 def delete_score(score_id):
     """Delete a score"""
-    query = f'''
-        DELETE FROM scores WHERE id = {score_id}
+    query = '''
+    DELETE FROM scores WHERE id = %s
     '''
-    result = create_connection_and_query(query, fetch_one=True)
+    params = (score_id,)
+    print('Deleteing')
+    result = create_connection_and_query(query, params=params)
 
-    if not result:
+    if(result == 0):
         return jsonify({'error': 'Score not found'}), 404
 
     return jsonify({'message': 'Score deleted successfully'})
@@ -230,10 +239,16 @@ def add_score():
     if not data or not all(field in data for field in required_fields):
         return jsonify({'error': 'Climber ID, route ID, completed status, and attempts are required'}), 400
 
-    query = '''INSERT INTO scores (climber_id, wall_id, grade, completed, attempts, notes) VALUES ({}, {}, {}, {}, {}, {})'''.format(
-        data['climber_id'], data['wall_id'], data['grade'], data['completed'], data['attempts'], data.get('notes', '')
+    query = '''INSERT INTO scores (climber_id, wall_id, grade, completed, attempts, notes) VALUES (%s, %s, %s, %s, %s, %s)'''
+    params = (
+        data['climber_id'],
+        data['wall_id'],
+        data['grade'],
+        data['completed'],
+        data['attempts'],
+        data.get('notes', '')
     )
-    create_connection_and_query(query)
+    create_connection_and_query(query, params=params)
 
     return jsonify({'message': 'Score recorded successfully'}), 201
 

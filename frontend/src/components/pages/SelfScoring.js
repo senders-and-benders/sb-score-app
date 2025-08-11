@@ -184,7 +184,7 @@ const SelfScoring = () => {
   };
 
   const handleDeleteScore = async (scoreId) => {
-    if (window.confirm('Are you sure you want to delete this score?')) {
+    if (window.confirm(`Are you sure you want to delete this score? - ${scoreId}`)) {
       try {
         await axios.delete(`/api/scores/${scoreId}`);
         fetchClimberScores(climberId);
@@ -233,17 +233,17 @@ const SelfScoring = () => {
 
   const getSelectedGymName = () => {
     const gym = gyms.find(g => g.id === parseInt(selections.gym_id));
-    return gym ? gym.gymName : '';
+    return gym ? gym.name : '';
   };
 
   const getSelectedAreaName = () => {
     const area = gymAreas.find(a => a.id === parseInt(selections.gym_area_id));
-    return area ? area.areaName : '';
+    return area ? area.name : '';
   };
 
   const getSelectedWallName = () => {
     const wall = walls.find(w => w.id === parseInt(selections.wall_id));
-    return wall ? wall.wallName : '';
+    return wall ? wall.name : '';
   };
 
   if (loading) return <div className="loading">Loading...</div>;
@@ -364,7 +364,7 @@ const SelfScoring = () => {
                       borderRadius: '8px'
                     }}
                   >
-                    <strong>{gym.gymName}</strong>
+                    <strong>{gym.name}</strong>
                   </button>
                 ))}
               </div>
@@ -394,7 +394,7 @@ const SelfScoring = () => {
                         borderRadius: '8px'
                       }}
                     >
-                      <strong>{area.areaName}</strong>
+                      <strong>{area.name}</strong>
                     </button>
                   ))}
                 </div>
@@ -425,7 +425,7 @@ const SelfScoring = () => {
                         borderRadius: '8px'
                       }}
                     >
-                      <strong>{wall.wallName}</strong>
+                      <strong>{wall.name}</strong>
                     </button>
                   ))}
                 </div>
@@ -532,7 +532,7 @@ const SelfScoring = () => {
             <h3>Your Recent Scores</h3>
             {scores.length > 0 ? (
               scores.slice(0, 5).map(score => (
-                <AscentCard  
+                <AscentCard
                   score={score} 
                   onDelete={handleDeleteScore} 
                 />

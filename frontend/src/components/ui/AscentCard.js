@@ -5,26 +5,19 @@ const AscentCard = ({
   showDeleteButton = true 
 }) => {
   
-  const getRouteInfo = (score) => {
-    return {
-      gymName: score.gymName || 'Unknown Gym',
-      gymAreaName: score.gymAreaName || 'Unknown Area',
-      wallName: score.wallName || 'Unknown Wall',
-      grade: score.grade || 'Unknown Grade'
+  const scoreInfo = {
+    climberName: score.climber_name || 'Unknown Climber',
+    gymName: score.gym_name || 'Unknown Gym',
+    gymAreaName: score.gym_area_name || 'Unknown Area',
+    wallName: score.wall_name || 'Unknown Wall',
+    grade: score.grade || 'Unknown Grade'
     };
-  };
-
-  const getClimberName = (climberId) => {
-    return score.climberName || `Climber ${climberId}`;
-  };
 
   const handleDelete = () => {
     if (onDelete) {
       onDelete(score.id);
     }
   };
-
-  const routeInfo = getRouteInfo(score);
 
   return (
     <div style={{ 
@@ -58,7 +51,7 @@ const AscentCard = ({
       )}
       
       <h4>
-        🧗‍♂️ {showClimberName ? `${getClimberName(score.climber_id)} - ` : ''}{routeInfo.gymName} - {routeInfo.gymAreaName} - {routeInfo.wallName}
+        🧗‍♂️ {showClimberName ? `${scoreInfo.climberName} - ` : ''}{scoreInfo.gymName} - {scoreInfo.gymAreaName} - {scoreInfo.wallName}
       </h4>
       
       <p>
@@ -66,12 +59,14 @@ const AscentCard = ({
         {' '} in {score.attempts} attempt{score.attempts !== 1 ? 's' : ''}
       </p>
       
-      <p><strong>Grade:</strong> {routeInfo.grade}</p>
+      <p><strong>Grade:</strong> {scoreInfo.grade}</p>
       
       {score.notes && <p><em>"{score.notes}"</em></p>}
       
       <small>
-        Recorded: {new Date(score.date_recorded || score.dateRecorded).toLocaleDateString()}
+        Recorded: {new Date(score.date_recorded).toLocaleDateString()}
+        <br />
+        Score ID: {score.id}
       </small>
     </div>
   );

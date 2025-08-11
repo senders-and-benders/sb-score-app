@@ -18,7 +18,7 @@ def get_database_url():
     # Fallback to individual environment variables for local development
     db_host = os.getenv('DB_HOST', 'localhost')
     db_port = os.getenv('DB_PORT', '5432')
-    db_name = os.getenv('DB_NAME', 'climbing_scores_db')
+    db_name = os.getenv('DB_NAME', 'app')
     db_user = os.getenv('DB_USER', 'postgres')
     db_password = os.getenv('DB_PASSWORD', 'password')
     
@@ -63,10 +63,12 @@ def execute_query(cursor, query, params=None, fetch_one=False, fetch_all=False):
         result = cursor.fetchall()
     else:
         result = cursor.rowcount
+        print('Not counting')
+        print(result)
           
     return result
 
-def create_connection_and_query(query, fetch_one=False, fetch_all=False):
+def create_connection_and_query(query, params=None, fetch_one=False, fetch_all=False):
     """
     Create a database connection and execute a query.
 
@@ -75,7 +77,8 @@ def create_connection_and_query(query, fetch_one=False, fetch_all=False):
     conn = get_db_connection()
     cursor = get_db_cursor(conn)
     
-    result = execute_query(cursor, query, fetch_one=fetch_one, fetch_all=fetch_all)
+    result = execute_query(cursor, query, params=params, fetch_one=fetch_one, fetch_all=fetch_all)
+    conn.commit()  # Commit changes if any
     
     cursor.close()
     conn.close()

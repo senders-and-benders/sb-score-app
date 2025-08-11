@@ -16,10 +16,10 @@ const RecentActivityFeed = ({ maxItems = 5 }) => {
       
       const recentCompletedAscents = response.data
         .filter(score => {
-          const scoreDate = new Date(score.date_recorded || score.dateRecorded);
+          const scoreDate = new Date(score.date_recorded);
           return score.completed && scoreDate >= oneWeekAgo;
         })
-        .sort((a, b) => new Date(b.date_recorded || b.dateRecorded) - new Date(a.date_recorded || a.dateRecorded))
+        .sort((a, b) => new Date(b.date_recorded) - new Date(a.date_recorded))
         .slice(0, maxItems);
       
       setRecentScores(recentCompletedAscents);
@@ -35,35 +35,20 @@ const RecentActivityFeed = ({ maxItems = 5 }) => {
   }, [fetchRecentActivity]);
 
   const formatActivityMessage = (score) => {
-    const climberName = score.climber_name || score.climberName || `Climber ${score.climber_id}`;
-    const gymName = score.gym_name || score.gymName || 'Unknown Gym';
-    const gymAreaName = score.gym_area_name || score.gymAreaName || 'Unknown Area';
-    const wallName = score.wall_name || score.wallName || 'Unknown Wall';
-    const timeAgo = getTimeAgo(score.date_recorded || score.dateRecorded);
+    const climberName = score.climber_name || `Climber ${score.climber_id}`;
+    const gymName = score.gym_name || 'Unknown Gym';
+    const gymAreaName = score.gym_area_name || 'Unknown Area';
+    const wallName = score.wall_name || 'Unknown Wall';
+    const dateRecorded = new Date(score.date_recorded).toLocaleDateString()
     
     return {
       climber: climberName,
       route: `${gymName} - ${gymAreaName} - ${wallName}`,
       grade: score.grade,
-      timeAgo: timeAgo,
       attempts: score.attempts,
-      notes: score.notes
+      notes: score.notes,
+      dateRecorded: dateRecorded
     };
-  };
-
-  const getTimeAgo = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-    
-    if (diffInHours < 1) return 'just now';
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays === 1) return 'yesterday';
-    if (diffInDays < 7) return `${diffInDays} days ago`;
-    
-    return date.toLocaleDateString();
   };
 
   if (loading) {
@@ -164,7 +149,7 @@ const RecentActivityFeed = ({ maxItems = 5 }) => {
                   color: '#999',
                   whiteSpace: 'nowrap' 
                 }}>
-                  {activity.timeAgo}
+                  {activity.dateRecorded}
                 </span>
               </div>
               

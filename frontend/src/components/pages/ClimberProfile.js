@@ -97,7 +97,6 @@ const Scores = () => {
           <AscentCard
             score={score}
             onDelete={handleDelete}
-            showClimberName={!!climberId}
           />
         ))}
       </div>

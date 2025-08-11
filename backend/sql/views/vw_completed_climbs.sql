@@ -1,10 +1,10 @@
 select 
-  s.id as score_id,
+  s.id,
   c.id as climber_id,
   g.id as gym_id,
   a.id as gym_area_id,
   w.id as wall_id,
-  c.name as climberName,
+  c.name as climber_name,
   g.name as gym_name,
   a.name as gym_area_name,
   w.name as wall_name,
