@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AscentCard from '../components/AscentCard';
+import ClimbingKPIChart from '../components/charts/ClimbingDashboard';
+
 
 const Scores = () => {
   const { climberId } = useParams();
@@ -66,17 +68,12 @@ const Scores = () => {
 
   return (
     <div>
-      <h2>
-        {climberId && currentClimber 
-          ? `${currentClimber.name}'s Climbing Scores` 
-          : 'Climbing Scores'
-        }
-      </h2>
+      <h2>Hello {currentClimber.name}, </h2>
       
       {climberId && currentClimber && (
         <div className="card" style={{ backgroundColor: '#e8f5e8', marginBottom: '1rem' }}>
           <p>
-            <strong>Viewing scores for: {currentClimber.name}</strong> 
+            <strong>Quick actions: </strong> 
             <span style={{ marginLeft: '1rem' }}>
               <button 
                 className="btn" 
@@ -91,8 +88,14 @@ const Scores = () => {
       )}
       
       {error && <div className="error">{error}</div>}
-
+      
+      <div className="card">
+        <h3>Climbing KPI Chart - Last 30 Days</h3>
+        <ClimbingKPIChart climberID={climberId} />
+      </div>
+      
       <div className='card'>
+        <h3>Climbing Log</h3>
         {filteredScores.map(score => (
           <AscentCard
             score={score}

@@ -19,6 +19,52 @@ def get_stats():
         'totalAscents': total_ascents
     })
 
+@routes_blueprint.route('/api/stats/climber/<int:climber_id>/last_30_days_metrics', methods=['GET'])
+def get_climber_stats_last_30_days_metrics(climber_id):
+    """Get last 30 dats statistics for a specific climber"""
+    kpi_query = '''
+    SELECT 
+	    count(*) as total_climbs,
+	    sum(score) as total_score
+    FROM vw_completed_climbs_last_30_days
+    WHERE climber_id = %s
+    '''
+    kpis = create_connection_and_query(kpi_query, params=(climber_id,), fetch_one=True)
+    total_climbs = kpis['total_climbs']
+    total_points = kpis['total_score']
+    latest_and_greatest_climb_data = create_connection_and_query('SELECT * FROM vw_completed_climbs_last_30_days WHERE climber_id = %s AND best_climb_rank = 1', params=(climber_id,), fetch_one=True)
+
+    return jsonify({
+        'totalClimbs': total_climbs,
+        'totalPoints': total_points,
+        'latestAndGreatestClimb': latest_and_greatest_climb_data,
+    })
+
+@routes_blueprint.route('/api/stats/climber/<int:climber_id>/last_30_days_daily_summary')
+def get_climber_stats_last_30_days_daily_summary(climber_id):
+    daily_metrics_query = '''
+    SELECT 
+        date_trunc('day', date_recorded)::date as date,
+        count(*) as total_climbs,
+        sum(score) as total_score
+    FROM vw_completed_climbs_last_30_days
+    WHERE climber_id = %s
+    GROUP BY date
+    ORDER BY date
+    '''
+    daily_metrics = create_connection_and_query(daily_metrics_query, params=(climber_id,), fetch_all=True)
+    return jsonify([dict(day) for day in daily_metrics])
+
+@routes_blueprint.route('/api/stats/climber/<int:climber_id>/last_30_days_data')
+def get_climber_stats_last_30_days_data(climber_id):
+    data_query = '''
+    SELECT *
+    FROM vw_completed_climbs_last_30_days
+    WHERE climber_id = %s
+    '''
+    data = create_connection_and_query(data_query, params=(climber_id,), fetch_all=True)
+    return jsonify(data)
+
 # Climbers endpoints
 @routes_blueprint.route('/api/climbers', methods=['GET'])
 def get_climbers():

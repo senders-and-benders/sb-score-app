@@ -2,16 +2,16 @@ import csv
 from scripts.postgres_utils import get_db_connection, get_db_cursor, execute_query
 
 #Helper functions useful for the main app
-def create_views_from_sql(conn, view_name):
+def create_view_from_sql(conn, view_name):
     """Create database views from sql files"""
-    cursor = get_db_cursor(conn)
-
+    #Open
     with open(f'./sql/views/{view_name}.sql', 'r') as file:
         view_query = file.read()
         create_view_query = f'CREATE VIEW {view_name} AS {view_query}'
-        drop_view_query = f'DROP VIEW IF EXISTS {view_name}'
+        drop_view_query = f'DROP VIEW IF EXISTS {view_name} CASCADE'
 
     #Execute using drop first then recreate
+    cursor = get_db_cursor(conn)
     execute_query(cursor, drop_view_query)
     execute_query(cursor, create_view_query)
     print(f'Created view: {view_name}')
@@ -74,10 +74,10 @@ def init_db():
     print('Initialising DB')
     conn = get_db_connection()
 
-    tables = ['climbers', 'grades', 'gyms', 'gym_areas', 'walls', 'scores']
 
     try:
         print('Creating tables...')
+        tables = ['climbers', 'grades', 'gyms', 'gym_areas', 'walls', 'scores']
         for table_name in tables:
             print(f'Creating {table_name}...')
             create_table_from_sql(conn, table_name)
@@ -88,8 +88,13 @@ def init_db():
 
         #Initiate and create all views
         print('Creating views...')
-        create_views_from_sql(conn, 'vw_completed_climbs')
-    
+        views = [
+            'vw_completed_climbs',
+            'vw_completed_climbs_last_30_days'
+        ] # ORDER IS IMPORTANT OR ELSE IT MAY BREAK. THIS MAY GET UNWIELDY LATER
+        for view_name in views:
+            create_view_from_sql(conn, view_name)
+
     except Exception as e:
         conn.rollback()
         raise e
