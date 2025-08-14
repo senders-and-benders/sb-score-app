@@ -2,23 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import AscentCard from '../components/AscentCard';
+import SelectionGrid from '../components/SelectionGrid';
 
 const SelfScoring = () => {
   const { climberId: urlClimberId } = useParams(); // Get climber ID from URL
   const [step, setStep] = useState(1); // 1: Select climber, 2: Select all options & submit
+  // Climbers
   const [climberId, setClimberId] = useState(urlClimberId || '');
   const [currentClimber, setCurrentClimber] = useState(null);
   const [climbers, setClimbers] = useState([]);
+  // Route
   const [gyms, setGyms] = useState([]);
   const [gymAreas, setGymAreas] = useState([]);
+  const [wallAreas, setWallAreas] = useState([]);
+  const [climbType, setClimbType] = useState('');
   const [walls, setWalls] = useState([]);
+  const [ropeNumbers, setRopeNumbers] = useState([]);
   const [grades, setGrades] = useState([]);
+  // Scores
   const [scores, setScores] = useState([]);
   const [loading, setLoading] = useState(true);
+  //Error
   const [error, setError] = useState(null);
+  // Submit form data
   const [selections, setSelections] = useState({
     gym_id: '',
     gym_area_id: '',
+    wall_area_name: '',
     wall_id: '',
     grade: ''
   });
@@ -27,8 +37,10 @@ const SelfScoring = () => {
     attempts: 1,
     notes: ''
   });
+  // Navigate
   const navigate = useNavigate();
 
+  // Add use effects to update data
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -39,7 +51,6 @@ const SelfScoring = () => {
     }
   }, [climberId]);
 
-  // Handle URL climber ID parameter
   useEffect(() => {
     if (urlClimberId && climbers.length > 0) {
       const climber = climbers.find(c => c.id === parseInt(urlClimberId));
@@ -51,6 +62,7 @@ const SelfScoring = () => {
     }
   }, [urlClimberId, climbers]);
 
+  // Fetching data
   const fetchInitialData = async () => {
     try {
       const [climbersRes, gymsRes] = await Promise.all([
@@ -75,19 +87,46 @@ const SelfScoring = () => {
     }
   };
 
-  const fetchWalls = async (gymAreaId) => {
+  const fetchWallAreasAndGrades = async (gymAreaId) => {
     try {
-      const response = await axios.get(`/api/gym_area/${gymAreaId}/walls`);
-      setWalls(response.data);
+      // Walls
+      if (gymAreaId) {
+        const responseWalls = await axios.get(`/api/gym_area/${gymAreaId}/walls`);
+        const dataWalls = responseWalls.data;
+        
+        // Get base data - This will be all walls irrespective of climb type in the area
+        setWalls(dataWalls);
+        
+        // Set wall areas which again do some lazy set to handle both unique bouldering walls and duplicate rope wall names (many rope numbers to one wall name)
+        const wallAreaNames = [ ... new Set(dataWalls.map(wall => wall.wall_name)) ];
+        setWallAreas(wallAreaNames.map(name => ({ wall_name: name })));
+
+        // Get the current area's climb type to alter the selection flow logic
+        const selectedGymArea = gymAreas.find(area => area.id === parseInt(gymAreaId));
+        const climbType = selectedGymArea.climb_type;
+        setClimbType(climbType);
+
+        // Finally get grades
+        const responseGrades = await axios.get(`/api/gym_area/${gymAreaId}/grades`);
+        setGrades(responseGrades.data);
+      } else {
+        setWallAreas([]);
+        setClimbType('');
+      }
     } catch (err) {
-      setError('Failed to load walls');
+      setError('Failed to load walls and grades');
     }
   };
 
-  const fetchGrades = async (wallId) => {
+  const fetchGrades = async (gymAreaId) => {
     try {
-      const response = await axios.get(`/api/wall/${wallId}/grades`);
-      setGrades(response.data);
+      if (gymAreaId) {
+        // Get grades
+        const responseGrades = await axios.get(`/api/gym_area/${gymAreaId}/grades`);
+        setGrades(responseGrades.data);
+      } else {
+        setGrades([]);
+      }
     } catch (err) {
       setError('Failed to load grades');
     }
@@ -102,6 +141,7 @@ const SelfScoring = () => {
     }
   };
 
+  // Simplified selection handlers
   const handleClimberSelect = (selectedClimberId) => {
     setClimberId(selectedClimberId);
     const climber = climbers.find(c => c.id === parseInt(selectedClimberId));
@@ -110,40 +150,62 @@ const SelfScoring = () => {
   };
 
   const handleGymSelect = (gymId) => {
-    setSelections(prev => ({ ...prev, gym_id: gymId, gym_area_id: '', wall_id: '', grade: '' }));
-    setGymAreas([]);
-    setWalls([]);
-    setGrades([]);
-    if (gymId) {
-      fetchGymAreas(gymId);
-    }
+    setSelections(prev => ({ ...prev, gym_id: gymId, gym_area_id: '', wall_area_name: '', wall_id: '', grade: '' }));
+    resetSelectionData(['gymAreas', 'wallsAreas', 'walls', 'ropeNumbers', 'grades']);
+    if (gymId) fetchGymAreas(gymId);
   };
 
   const handleAreaSelect = (areaId) => {
-    setSelections(prev => ({ ...prev, gym_area_id: areaId, wall_id: '', grade: '' }));
-    setWalls([]);
-    setGrades([]);
+    setSelections(prev => ({ ...prev, gym_area_id: areaId, wall_area_name: '', wall_id: '', grade: '' }));
+    resetSelectionData(['wallsAreas', 'walls', 'ropeNumbers', 'grades']);
+    setClimbType('');
     if (areaId) {
-      fetchWalls(areaId);
-    }
+      fetchWallAreasAndGrades(areaId);
+      fetchGrades(areaId);
+    };
   };
 
-  const handleWallSelect = (wallId, climbType) => {
+  const handleWallSelect = (wallName) => {
+    resetSelectionData(['ropeNumbers']);
+    if (climbType === 'Ropes') {
+      // For ropes there is a list of rope IDs that exist and an additional step is required so set ropes 
+      const currentWall = walls.filter(wall => wall.wall_name === wallName);
+      setRopeNumbers(currentWall);
+      setSelections(prev => ({ ...prev, wall_area_name: wallName, wall_id: '', grade: '' }));
+    } else {
+      // For bouldering (not Ropes) there is always 1 wall id to 1 wall name, so set selection straight away
+      const currentWall = walls.find(wall => wall.wall_name === wallName);
+      console.log('current wall: ', currentWall);
+      setSelections(prev => ({ ...prev, wall_area_name: wallName, wall_id: currentWall.id, grade: '' }));
+    };
+  };
+
+  const handleRopeNumberSelect = (ropeId) => {
     setSelections(prev => ({ 
       ...prev, 
-      wall_id: wallId, 
+      wall_id: ropeId, // Store actual wall ID
       grade: '' 
     }));
-    setGrades([]);
-    if (wallId) {
-      fetchGrades(wallId);
-    }
   };
 
   const handleGradeSelect = (grade) => {
+    console.log('Selected grade:', selections);
     setSelections(prev => ({ ...prev, grade: grade }));
   };
 
+  // Helper function to reset multiple state arrays
+  const resetSelectionData = (dataTypes) => {
+    const resetMap = {
+      gymAreas: () => setGymAreas([]),
+      walls: () => setWalls([]),
+      wallAreas: () => setWallAreas([]),
+      ropeNumbers: () => setRopeNumbers([]),
+      grades: () => setGrades([])
+    };
+    dataTypes.forEach(type => resetMap[type]?.());
+  };  
+  
+  // Score submit
   const handleScoreSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -204,6 +266,7 @@ const SelfScoring = () => {
     setSelections({
       gym_id: '',
       gym_area_id: '',
+      wall_area_name: '',
       wall_id: '',
       grade: ''
     });
@@ -213,11 +276,14 @@ const SelfScoring = () => {
       notes: ''
     });
     setGymAreas([]);
+    setWallAreas([]);
     setWalls([]);
+    setRopeNumbers([]);
     setGrades([]);
     setScores([]);
   };
 
+  // Getting some pretty names
   const getCurrentStepTitle = () => {
     switch (step) {
       case 1: return 'Select Climber';
@@ -237,8 +303,12 @@ const SelfScoring = () => {
   };
 
   const getSelectedWallName = () => {
-    const wall = walls.find(w => w.id === parseInt(selections.wall_id));
-    return wall ? wall.name : '';
+    return selections.wall_area_name
+  };
+
+  const getRopeNumber = () => {
+    const rope = ropeNumbers.find(r => r.id === parseInt(selections.wall_id));
+    return rope ? `#${rope.wall_number}` : '';
   };
 
   if (loading) return <div className="loading">Loading...</div>;
@@ -257,7 +327,8 @@ const SelfScoring = () => {
               <strong>{currentClimber?.name}</strong>
               {selections.gym_id && <span> → {getSelectedGymName()}</span>}
               {selections.gym_area_id && <span> → {getSelectedAreaName()}</span>}
-              {selections.wall_id && <span> → {getSelectedWallName()}</span>}
+              {selections.wall_area_name && <span> → {getSelectedWallName()}</span>}
+              {climbType === 'Ropes' && selections.wall_id && <span> → {getRopeNumber()}</span>}
               {selections.grade && <span> → {selections.grade}</span>}
             </div>
             <div>
@@ -311,120 +382,68 @@ const SelfScoring = () => {
             <h3>Submit New Score</h3>
             
             {/* Gym Selection */}
-            <div>
-              <h4>Select a Gym:</h4>
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                  gap: '10px', 
-                  marginTop: '1rem' 
-                }}>
-                {gyms.map(gym => (
-                  <button
-                    key={gym.id}
-                    className="btn"
-                    onClick={() => handleGymSelect(gym.id)}
-                    style={{
-                      padding: '1rem',
-                      textAlign: 'center',
-                      backgroundColor: selections.gym_id === gym.id ? '#e3f2fd' : 'white',
-                      border: selections.gym_id === gym.id ? '2px solid #2196f3' : '2px solid #ddd',
-                      color: '#333',
-                      borderRadius: '8px'
-                    }}
-                  >
-                    <strong>{gym.name}</strong>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <SelectionGrid
+              title="Select a Gym:"
+              items={gyms}
+              onSelect={handleGymSelect}
+              selectedValue={selections.gym_id}
+              keyField="id"
+              displayField="name"
+              colorScheme="blue"
+            />
 
             {/* Area Selection */}
             {selections.gym_id && (
-              <div style={{ marginTop: '2rem' }}>
-                <h4>Select an Area in {getSelectedGymName()}:</h4>
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                  gap: '10px', 
-                  marginTop: '1rem' 
-                }}>
-                  {gymAreas.map(area => (
-                    <button
-                      key={area.id}
-                      className="btn"
-                      onClick={() => handleAreaSelect(area.id)}
-                      style={{
-                        padding: '1rem',
-                        textAlign: 'center',
-                        backgroundColor: selections.gym_area_id === area.id ? '#e8f5e8' : 'white',
-                        border: selections.gym_area_id === area.id ? '2px solid #4caf50' : '2px solid #ddd',
-                        color: '#333',
-                        borderRadius: '8px'
-                      }}
-                    >
-                      <strong>{area.name}</strong>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <SelectionGrid
+                title={`Select an Area in ${getSelectedGymName()}:`}
+                items={gymAreas}
+                onSelect={handleAreaSelect}
+                selectedValue={selections.gym_area_id}
+                keyField="id"
+                displayField="name"
+                colorScheme="green"
+              />
             )}
 
             {/* Wall Selection */}
             {selections.gym_area_id && (
-              <div style={{ marginTop: '2rem' }}>
-                <h4>Select a Wall in {getSelectedAreaName()}:</h4>
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                  gap: '10px', 
-                  marginTop: '1rem'
-                }}>
-                  {walls.map(wall => (
-                    <button
-                      key={wall.id}
-                      className="btn"
-                      onClick={() => handleWallSelect(wall.id, wall.climbType)}
-                      style={{
-                        padding: '1rem',
-                        textAlign: 'center',
-                        backgroundColor: selections.wall_id === wall.id ? '#fff3e0' : 'white',
-                        border: selections.wall_id === wall.id ? '2px solid #ff9800' : '2px solid #ddd',
-                        color: '#333',
-                        borderRadius: '8px'
-                      }}
-                    >
-                      <strong>{wall.name}</strong>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <SelectionGrid
+                title={`Select a Wall in ${getSelectedAreaName()}:`}
+                items={wallAreas}
+                onSelect={handleWallSelect}
+                selectedValue={selections.wall_area_name}
+                keyField={'wall_name'}
+                displayField={'wall_name'}
+                colorScheme="orange"
+              />
+            )}
+
+            {/* Rope Number Selection - Only for Ropes */}
+            {climbType === 'Ropes' && selections.wall_area_name && ropeNumbers.length > 0 && (
+              <SelectionGrid
+                title={`Select Route Number on ${selections.wall_area_name}:`}
+                items={ropeNumbers}
+                onSelect={handleRopeNumberSelect}
+                selectedValue={selections.wall_id}
+                keyField="id"
+                displayField="wall_number"
+                colorScheme="blue"
+                minWidth="80px"
+              />
             )}
 
             {/* Grade Selection */}
             {selections.wall_id && (
-              <div style={{ marginTop: '2rem' }}>
-                <h4>Select Grade for {getSelectedWallName()}:</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '10px', marginTop: '1rem' }}>
-                  {grades.map(grade => (
-                    <button
-                      key={grade.grade}
-                      className="btn"
-                      onClick={() => handleGradeSelect(grade.grade)}
-                      style={{
-                        padding: '1rem',
-                        backgroundColor: selections.grade === grade.grade ? '#f3e5f5' : 'white',
-                        border: selections.grade === grade.grade ? '2px solid #9c27b0ff' : '2px solid #ddd',
-                        color: '#333',
-                        fontWeight: 'bold',
-                        borderRadius: '8px'
-                      }}
-                    >
-                      {grade.grade}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <SelectionGrid
+                title={`Select Grade for ${getSelectedWallName()}:`}
+                items={grades}
+                onSelect={handleGradeSelect}
+                selectedValue={selections.grade}
+                keyField="grade"
+                displayField="grade"
+                colorScheme="purple"
+                minWidth="100px"
+              />
             )}
 
             {/* Score Details Form */}
@@ -433,7 +452,7 @@ const SelfScoring = () => {
                 <form onSubmit={handleScoreSubmit}>
                   <div style={{ backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: '4px', marginBottom: '1rem' }}>
                     <strong>Selected Route:</strong><br />
-                    {getSelectedGymName()} → {getSelectedAreaName()} → {getSelectedWallName()} → {selections.grade}
+                    {getSelectedGymName()} → {getSelectedAreaName()} → {getSelectedWallName()} → {climbType === 'Ropes' ? `${getRopeNumber()} →` : ''}  {selections.grade}
                   </div>
 
                   <div className="form-group">

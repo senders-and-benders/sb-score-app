@@ -10,6 +10,8 @@ const AscentCard = ({
     gymName: score.gym_name || 'Unknown Gym',
     gymAreaName: score.gym_area_name || 'Unknown Area',
     wallName: score.wall_name || 'Unknown Wall',
+    climbType: score.climb_type || 'Unknown Type',
+    wallNumber: score.wall_number || '',
     grade: score.grade || 'Unknown Grade'
     };
 
@@ -51,7 +53,9 @@ const AscentCard = ({
       )}
       
       <h4>
-        🧗‍♂️ {showClimberName ? `${scoreInfo.climberName} - ` : ''}{scoreInfo.gymName} - {scoreInfo.gymAreaName} - {scoreInfo.wallName}
+        🧗‍♂️ {showClimberName ? `${scoreInfo.climberName} - ` : ''}
+        {scoreInfo.gymName} - {scoreInfo.gymAreaName} - {scoreInfo.wallName}
+        {scoreInfo.climbType === "Ropes" ? ` - #${scoreInfo.wallNumber}` : ''}
       </h4>
       
       <p>
@@ -66,7 +70,6 @@ const AscentCard = ({
       <small>
         Recorded: {new Date(score.date_recorded).toLocaleDateString()}
         <br />
-        Score ID: {score.id}
       </small>
     </div>
   );

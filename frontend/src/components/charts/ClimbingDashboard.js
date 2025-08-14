@@ -110,10 +110,10 @@ const ClimbingKPIChart = ({ climberID }) => {
             It took you <strong>{latestGreatestClimb.attempts}</strong> attempts.
           </ClimbingKPIText>
         </Grid>
-        <Grid size={{xs: 6, sm: 6}}>
+        <Grid size={{xs: 12, sm: 6}}>
           <GroupedBarChart climbs={climbingBarData.bouldering} title={"# Climbs by Colour - Bouldering"} />
         </Grid>
-        <Grid size={{xs: 6, sm: 6}}>
+        <Grid size={{xs: 12, sm: 6}}>
           <GroupedBarChart climbs={climbingBarData.ropes} title={"# Climbs by Colour - Ropes"} />
         </Grid>
       </Grid>

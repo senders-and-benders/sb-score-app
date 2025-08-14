@@ -128,6 +128,7 @@ def get_gym_areas(gym_id):
     query = '''
     SELECT 
         ga.id,
+        ga.climb_type,
         ga.name
     FROM gym_areas ga
     WHERE ga.gym_id = %s
@@ -143,8 +144,8 @@ def get_gym_routes(gym_id):
     SELECT 
         w.id,
         ga.name as gym_area_name,
-        w.name,
-        w.climb_type
+        w.wall_name,
+        w.wall_number
     FROM walls w
     JOIN gym_areas ga ON w.gym_area_id = ga.id
     WHERE w.gym_id = %s
@@ -161,6 +162,7 @@ def get_all_gym_areas():
     SELECT 
         ga.id,
         g.name as gym_name,
+        ga.climb_type,
         ga.name
     FROM gym_areas ga 
     JOIN gyms g ON ga.gym_id = g.id
@@ -175,10 +177,26 @@ def get_gym_area_walls(gym_area_id):
     query = '''
     SELECT 
         w.id,
-        w.name,
-        w.climb_type
+        w.wall_name,
+        w.wall_number
     FROM walls w
     WHERE w.gym_area_id = %s
+    '''
+    params = (gym_area_id,)
+    walls = create_connection_and_query(query, params=params, fetch_all=True)
+    return jsonify([dict(wall) for wall in walls])
+
+@routes_blueprint.route('/api/gym_area/<int:gym_area_id>/grades', methods=['GET'])
+def get_gym_area_grades(gym_area_id):
+    """Get all walls for a specific gym area"""
+    query = '''
+    SELECT 
+        g.id,
+        a.climb_type,
+        g.grade
+    FROM gym_areas a
+    LEFT JOIN grades g ON a.climb_type = g.climb_type
+    WHERE a.id = %s
     '''
     params = (gym_area_id,)
     walls = create_connection_and_query(query, params=params, fetch_all=True)
@@ -193,12 +211,13 @@ def get_all_walls():
         w.id,
         g.name as gym_name,
         ga.name as gym_area_name,
-        w.name,
-        w.climb_type
+        ga.climb_type,
+        w.wall_name,
+        w.wall_number
     FROM walls w 
     JOIN gym_areas ga ON w.gym_area_id = ga.id
     JOIN gyms g ON ga.gym_id = g.id
-    ORDER BY w.name
+    ORDER BY w.wall_name
     '''
     walls = create_connection_and_query(query, fetch_all=True)
     return jsonify([dict(wall) for wall in walls])
@@ -209,11 +228,12 @@ def get_wall_grades(wall_id):
     query = '''
     SELECT 
         g.id,
-        w.name as wall_name,
-        w.climb_type,
+        w.wall_name,
+        a.climb_type,
         g.grade
     FROM walls w
-    JOIN grades g ON w.climb_type = g.climb_type
+    JOIN gym_areas a ON w.gym_area_id = a.id
+    JOIN grades g ON a.climb_type = g.climb_type
     WHERE w.id = %s
     ORDER BY g.id
     '''
@@ -245,7 +265,12 @@ def get_all_scores():
 def get_climber_scores(climber_id):
     """Get scores for a specific climber"""
     query = '''
-    SELECT * FROM climbers WHERE id = %s
+    SELECT 
+        c.id,
+        c.name,
+        c.nickname,
+        c.date_created
+    FROM climbers c WHERE c.id = %s
     '''
     params = (climber_id,)
     climber = create_connection_and_query(query, params=params, fetch_one=True)

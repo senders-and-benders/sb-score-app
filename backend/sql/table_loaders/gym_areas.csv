@@ -1,6 +1,6 @@
-id,gym_id,name
-1,1,Onestead
-2,1,Twostead
-3,2,Milton
-4,3,Boulder Hall
-5,3,Rope Hall
+id,gym_id,climb_type,name
+1,1,Bouldering,Onestead
+2,1,Bouldering,Twostead
+3,2,Bouldering,Milton
+4,3,Bouldering,Boulder Hall
+5,3,Ropes,Rope Hall
