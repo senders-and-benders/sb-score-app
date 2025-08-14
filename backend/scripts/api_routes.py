@@ -270,7 +270,7 @@ def get_climber_scores(climber_id):
         c.name,
         c.nickname,
         c.date_created
-    FROM climbers c WHERE c.id = %s
+    FROM climbers c WHERE id = %s
     '''
     params = (climber_id,)
     climber = create_connection_and_query(query, params=params, fetch_one=True)

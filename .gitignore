@@ -61,4 +61,5 @@ Thumbs.db
 
 # Others
 setup
+*.code-workspace
 # backend/build

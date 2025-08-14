@@ -1,21 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Navigation from './components/Navigation';
-import Dashboard from './pages/Dashboard';
-import Climbers from './pages/Climbers';
+import Header from './components/Header/Header';
+import Dashboard from './pages/Dashboard/Dashboard';
+import Climbers from './pages/Climbers/Climbers';
 import SelfScoring from './pages/SelfScoring';
 import ClimberProfile from './pages/ClimberProfile';
-import PageNotFound from './pages/PageNotFound';
+import PageNotFound from './pages/PageNotFound/PageNotFound';
 import './App.css';
+
+import { Container } from '@mui/material';
 
 function App() {
   return (
     <Router>
-      <div className="App">
+      {/* <div className="App"> */}
         <Header />
-        <Navigation />
-        <div className="container">
+        <Container>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/climbers" element={<Climbers />} />
@@ -24,8 +24,8 @@ function App() {
             <Route path="/climber-profile/:climberId" element={<ClimberProfile />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
-        </div>
-      </div>
+        </Container>
+      {/* </div> */}
     </Router>
   );
 }

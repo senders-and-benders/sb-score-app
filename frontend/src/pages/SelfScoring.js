@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import AscentCard from '../components/AscentCard';
+import AscentCard from '../components/AscentCard/AscentCard';
 import SelectionGrid from '../components/SelectionGrid';
 
 const SelfScoring = () => {

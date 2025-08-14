@@ -1,0 +1,55 @@
+.ascent-card {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  position: relative;
+}
+
+.ascent-card__delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #4b4b4b;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.ascent-card__delete-button:hover {
+  background: #c82333;
+}
+
+.ascent-card__title {
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+}
+
+.ascent-card__status {
+  margin: 5px 0;
+}
+
+.ascent-card__grade {
+  margin: 5px 0;
+}
+
+.ascent-card__notes {
+  margin: 10px 0;
+  font-style: italic;
+}
+
+.ascent-card__timestamp {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 10px;
+}

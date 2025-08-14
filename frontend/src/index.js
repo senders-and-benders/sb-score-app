@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -20,23 +19,30 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-  },
+    fontFamily: 'Montserrat, sans-serif',
+    h1: {
+      fontSize: '2.5rem',
+      fontWeight: 300
+    },
+    h2: {
+      fontSize: '2rem',
+      fontWeight: 300
+    },
+    h3: {
+      fontSize: '1.5rem',
+      fontWeight: 300
+    },
+    h4: {
+      fontSize: '1.25rem',
+      fontWeight: 300
+    },
+  }
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <CssBaseline />
       <App />
     </ThemeProvider>
   </React.StrictMode>
