@@ -1,4 +1,5 @@
 import React from 'react';
+import { Typography, Box } from '@mui/material';
 
 // Reusable Selection Component
 const SelectionGrid = ({ title, items, onSelect, selectedValue, keyField, displayField, colorScheme, minWidth = '120px' }) => {
@@ -13,37 +14,37 @@ const SelectionGrid = ({ title, items, onSelect, selectedValue, keyField, displa
 
   return (
     <div style={{ marginTop: '2rem' }}>
-    <h4>{title}</h4>
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: `repeat(auto-fit, minmax(${minWidth}, 1fr))`,
-      gap: '10px', 
-      marginTop: '1rem'
-    }}>
-      {items.map(item => {
-      const key = item[keyField];
-      const display = item[displayField];
-      const isSelected = selectedValue === key;
-      
-      return (
-        <button
-        key={key}
-        className="btn"
-        onClick={() => onSelect(key, item)}
-        style={{
-          padding: '1rem',
-          textAlign: 'center',
-          backgroundColor: isSelected ? scheme.bg : 'white',
-          border: isSelected ? `2px solid ${scheme.border}` : '2px solid #ddd',
-          color: '#333',
-          borderRadius: '8px'
-        }}
-        >
-        <strong>{display}</strong>
-        </button>
-      );
-      })}
-    </div>
+      <Typography variant="h4">{title}</Typography>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(auto-fit, minmax(${minWidth}, 1fr))`,
+        gap: '10px',
+        marginTop: '1rem'
+      }}>
+        {items.map(item => {
+          const key = item[keyField];
+          const display = item[displayField];
+          const isSelected = selectedValue === key;
+
+        return (
+          <button
+          key={key}
+          className="btn"
+          onClick={() => onSelect(key, item)}
+          style={{
+            padding: '1rem',
+            textAlign: 'center',
+            backgroundColor: isSelected ? scheme.bg : 'white',
+            border: isSelected ? `2px solid ${scheme.border}` : '2px solid #ddd',
+            color: '#333',
+            borderRadius: '8px'
+          }}
+          >
+          <Typography variant="body2">{display}</Typography>
+          </button>
+        );
+        })}
+      </div>
     </div>
   );
 };

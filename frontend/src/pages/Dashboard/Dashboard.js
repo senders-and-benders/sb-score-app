@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Typography, Chip, Stack, Grid, Paper } from '@mui/material';
+import { Box, Typography, Chip, Stack, Grid, Paper, Container } from '@mui/material';
 import Divider from '@mui/material/Divider';
 
 // Icons
@@ -8,7 +8,10 @@ import AddIcon from '@mui/icons-material/Add';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TerrainIcon from '@mui/icons-material/Terrain';
 import PersonIcon from '@mui/icons-material/Person';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 
+// Components
+import Button from '../../components/ui/Button';
 import RecentActivityFeed from '../../components/RecentActivityFeed';
 
 
@@ -39,42 +42,80 @@ const Dashboard = () => {
   if (loading) return <div className="loading">Loading dashboard...</div>;
   if (error) return <div className="error">{error}</div>;
 
-  const KpiCard = ({ title, value, icon }) => (
-    <Grid item xs={12} sm={4}>
-      <Paper elevation={1} sx={{ p: 4, textAlign: 'center', height: '100%', minWidth: '150px'}}>
-        {icon}
+  const KpiCard = ({ title, value, icon, description }) => (
+    <Box 
+      elevation={0.5} 
+      sx={{ 
+        p: 2, 
+        textAlign: 'center', 
+        height: '150px',
+        minWidth: '200px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+      <Stack spacing={0.5} alignItems="center" width="100%">
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: 48,
+            height: 48,
+            borderRadius: '50%',
+            backgroundColor: '#dfdfdfba',
+            margin: '0 auto',
+            mb: 2
+          }}
+        >
+          {React.cloneElement(icon, { sx: { fontSize: 32 } })}
+        </Box>
         <Typography variant="h3">{value}</Typography>
-        <Typography variant="body1"><i>{title}</i></Typography>
-      </Paper>
-    </Grid>
+        <Typography variant="body2"><i>{title}</i></Typography>
+        <Typography variant="caption"><i>{description ? <>{description}</> : ''}</i></Typography>
+      </Stack>
+    </Box>
   );
 
   return (
-    <Box py={2}>
-      <Typography variant='h2'>Dashboard</Typography>
-      <Stack direction="row" spacing={2} mb={2} sx={{ py: 2 }}>
-        <Chip icon={<AddIcon />} label="Add New Score" onClick={() => window.location.href = '/self-scoring'} />
-        <Chip icon={<PersonAddIcon />} label="Add New Climber" onClick={() => window.location.href = '/climbers'} />
-      </Stack>
+    // <Box display="flex" flexDirection="column" alignItems="center" width="100%">
+    <Container>
+      {/* Intro */}
+      <Box py={10}>
+        <Stack direction="column" spacing={2} mb={2} sx={{ py: 2 }} justifyContent="center" alignItems="center">
+          <Typography variant='h1'>Score Your Climbs</Typography>
+          <Typography variant="body1">Hello. Get started on scoring by adding your climbs</Typography>
+          <Button colour="primary" icon={ShowChartIcon} label="Start Scoring" path="/self-scoring"/>
+        </Stack>
+      </Box>
 
-      <Stack gap={2}>
-        <Box>
-          <Grid container spacing={2} mb={2} justifyContent="center" alignItems="center" width="100%">
-            <KpiCard title="Total Climbers" value={stats.totalClimbers} icon={<PersonIcon sx={{ fontSize: 64 }} />} />
-            <KpiCard title="Total Walls" value={stats.totalWalls} icon={<TerrainIcon sx={{ fontSize: 64 }} />} />
-            <KpiCard title="Total Ascents" value={stats.totalAscents} icon={<TerrainIcon sx={{ fontSize: 64 }} />} />
-          </Grid>
-        </Box>
-
-        <Divider />
-
-        <Box>
-          <Typography variant='h3'>🏆 Recent Activity</Typography>
-          <RecentActivityFeed maxItems={10} />
-        </Box>
-      </Stack>
-    
-    </Box>
+      {/* Stats */}
+      <Box>
+        <Stack direction="column" spacing={2} mb={2} sx={{ py: 2 }} justifyContent="center" alignItems="center">
+          <Typography variant='h2'><b>Senders and Benders Stats</b></Typography>
+          <Typography variant='body1'>We are nerds and love some numbers</Typography>
+          <Grid container spacing={2} mb={2} justifyContent="center" alignItems="center">
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <KpiCard 
+                title="Climbers" 
+                value={stats.totalClimbers} 
+                icon={<PersonIcon />} 
+                description='Climbers who use the app'
+                />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <KpiCard 
+                title="Sends" 
+                value={stats.totalAscents} 
+                icon={<TerrainIcon />} 
+                description='Climbs we sent' 
+              />
+            </Grid>
+          </Grid>     
+        </Stack>
+      </Box> 
+    </Container>
   );
 };
 

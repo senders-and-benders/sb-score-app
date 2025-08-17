@@ -1,0 +1,10 @@
+
+.custom-header {
+	background-color: #000 !important;
+	color: #fff !important;
+}
+
+.MuiDataGrid-columnHeader {
+  background-color: #862121ff;
+  color: #fff;
+}

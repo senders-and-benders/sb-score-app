@@ -1,63 +1,29 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
 
-const ClimbingLog = ({
+const ClimbingLog = ({ 
   scores = [],
-  showClimberName = false
+  showClimberName = true
 }) => {
-  // Determine phone breakpoint
-  const theme = useTheme();
-  const isXs = useMediaQuery(theme.breakpoints.only('xs')) ? false : true; // Reverse it as i will use it in the columnvisible prop
-  
+  // Detect small screens
+  const isSmallScreen = useMediaQuery('(max-width:600px)');
+
   // Define columns for DataGrid
   const columns = [
-    {
-      field: 'date_recorded',
-      headerName: 'Date',
-      type: 'date',
+    { field: 'date_recorded', headerName: 'Date', type: 'date', minWidth: 120, valueGetter: (key, row) => new Date(row.date_recorded) },
+    { field: 'climber_name', headerName: 'Climber', minWidth: 150, hide: !showClimberName || isSmallScreen },
+    { field: 'gym_name', headerName: 'Gym', minWidth: 120, hide: false },
+    { field: 'climb_type', headerName: 'Type', minWidth: 100, hide: isSmallScreen },
+    { 
+      field: 'wall_name', 
+      headerName: 'Wall', 
       minWidth: 120,
-      flex: 1,
-      valueGetter: (value, row) => new Date(row.date_recorded)
+      hide: isSmallScreen,
+      valueGetter: (key, row) => `${row.wall_name} ${row.climb_type === 'Ropes' ? `(#${row.wall_number})` : ''}`,
     },
-    { 
-      field: 'climb_type', 
-      headerName: 'Type', 
-      minWidth: 100,
-      flex: 1
-    },
-    { 
-      field: 'climber_name', 
-      headerName: 'Climber', 
-      minWidth: 150, 
-      flex: 1
-    },
-    { 
-      field: 'gym_name', 
-      headerName: 'Gym', 
-      minWidth: 150, 
-      flex: 1
-    },
-    {
-      field: 'wall_name',
-      headerName: 'Wall',
-      minWidth: 150,
-      flex: 1,
-      valueGetter: (value, row) => `${row.wall_name} ${row.climb_type === 'Ropes' ? `(#${row.wall_number})` : ''}`,
-    },
-    { 
-      field: 'grade', 
-      headerName: 'Grade', 
-      minWidth: 100,
-      flex: 1
-    },
-    { 
-      field: 'attempts', 
-      headerName: 'Attempts', 
-      minWidth: 100,
-      flex: 1
-    },
+    { field: 'grade', headerName: 'Grade', minWidth: 100, hide: false },
+    { field: 'attempts', headerName: 'Attempts', minWidth: 100, hide: isSmallScreen },
   ];
 
   const initialPagination = { pageSize: 10, page: 0 };
@@ -72,27 +38,23 @@ const ClimbingLog = ({
           pagination: { paginationModel: initialPagination }
         }}
         disableRowSelectionOnClick
-        showToolbar
         sx={{
           border: 'none',
+          '& .MuiDataGrid-columnHeaders': {
+            backgroundColor: '#000',
+            color: '#fff',
+          },
+          '& .MuiDataGrid-row': {
+            backgroundColor: '#f5f5f5',
+          },
           '& .MuiDataGrid-columnHeader': {
             backgroundColor: '#3b3b3bff',
             color: '#fff',
-            textAlign: 'center',
-          },
-          '& .MuiDataGrid-cell': {
-            textAlign: 'center',
-            backgroundColor: '#f5f5f5',
           },
           '& .MuiDataGrid-toolbar': {
             borderBottom: '1px solid',
             borderColor: 'divider',
           },
-        }}
-        columnVisibilityModel={{
-          climber_name: showClimberName,
-          climb_type: isXs,
-          attempts: isXs
         }}
       />
     </div>

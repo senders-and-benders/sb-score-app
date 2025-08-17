@@ -30,7 +30,7 @@ export const ClimbingKPIContainer = ({ children, title }) => (
 
 export const ClimbingKPI = ({ value, title, sparklineDataY=[], sparklineDataX=[] }) => (
   <ClimbingKPIContainer title={title}>
-    <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 2, flex: 1}}>
+    <Box sx={{ mt: 1, display: 'flex', flexDirection:'column', alignItems: 'center', gap: 2, flex: 1}}>
       <ThemeProvider theme={theme}>
         <Typography variant="h4" color="primary">
           {value}

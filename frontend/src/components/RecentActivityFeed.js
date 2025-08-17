@@ -94,17 +94,6 @@ const RecentActivityFeed = ({ maxItems = 5 }) => {
       borderRadius: '8px',
       backgroundColor: 'white'
     }}>
-      {/* Header */}
-      <div style={{
-        padding: '12px 16px',
-        backgroundColor: '#f8f9fa',
-        borderBottom: '1px solid #eee',
-        fontWeight: 'bold',
-        color: '#333'
-      }}>
-        🏆 Last {recentScores.length} Sends This Week
-      </div>
-
       {/* Static list of recent activities */}
       <div style={{ padding: '8px' }}>
         {recentScores.map((score, index) => {
