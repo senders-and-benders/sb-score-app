@@ -16,6 +16,7 @@ const Scores = () => {
   const { climberId } = useParams();
   const [scores, setScores] = useState([]);
   const [currentClimber, setCurrentClimber] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Dirty
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -41,6 +42,7 @@ const Scores = () => {
       try {
         await axios.delete(`/api/scores/${id}`);
         fetchClimberScores();
+        setRefreshTrigger(prev => prev + 1);
       } catch (err) {
         setError('Failed to delete score');
       }
@@ -76,7 +78,7 @@ const Scores = () => {
       {/* Dashboard */}
       <Box className="card" >
         <Typography my={2} variant='h3'>Climbing Dashboard - Last 30 Days</Typography>
-        <ClimbingKPIChart climberID={climberId} />
+        <ClimbingKPIChart climberID={climberId} refreshTrigger={refreshTrigger}/>
       </Box>
 
       {/* Logs */}

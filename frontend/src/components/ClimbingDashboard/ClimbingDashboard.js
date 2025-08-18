@@ -4,7 +4,7 @@ import axios from 'axios';
 import { ClimbingKPI, ClimbingKPIText } from './ClimbingKPI';
 import { GroupedBarChart } from './ClimbingBar';
 
-const ClimbingKPIChart = ({ climberID }) => {
+const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
   const [climbingKPIData, setClimbingKPIData] = useState({
     totalClimbs: 0,
     totalPoints: 0
@@ -18,7 +18,7 @@ const ClimbingKPIChart = ({ climberID }) => {
 
   useEffect(() => {
     fetchScoresData();
-  }, []);
+  }, [climberID, refreshTrigger]);
 
   const fetchScoresData = async () => {
     try {
@@ -121,4 +121,4 @@ const ClimbingKPIChart = ({ climberID }) => {
     )
   };
 
-export default ClimbingKPIChart;
+export default ClimbingDashboard;
