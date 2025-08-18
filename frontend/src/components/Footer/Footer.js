@@ -56,7 +56,7 @@ const Footer = () => {
               </IconButton>
               <IconButton 
                 component="a" 
-                href="https://store.sendersandbenders.com" 
+                href="https://shop.sendersandbenders.com" 
                 color="inherit"
                 sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}
               >

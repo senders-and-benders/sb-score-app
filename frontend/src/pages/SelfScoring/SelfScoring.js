@@ -149,6 +149,8 @@ const SelfScoring = () => {
     setClimberId(selectedClimberId);
     const climber = climbers.find(c => c.id === parseInt(selectedClimberId));
     setCurrentClimber(climber);
+    // Update URL with climber ID
+    navigate(`/self-scoring/${climber.id}`);
     setStep(2);
   };
 
@@ -257,12 +259,7 @@ const SelfScoring = () => {
   };
 
   const resetToClimberSelection = () => {
-    // If we came from a parameterized route, navigate to base route
-    if (urlClimberId) {
-      navigate('/self-scoring');
-      return;
-    }
-    
+    // Reset all state first
     setStep(1);
     setClimberId('');
     setCurrentClimber(null);
@@ -284,6 +281,11 @@ const SelfScoring = () => {
     setRopeNumbers([]);
     setGrades([]);
     setScores([]);
+    
+    // If we came from a parameterized route, navigate to base route
+    if (urlClimberId) {
+      navigate('/self-scoring');
+    }
   };
 
   // Getting some pretty names
@@ -321,7 +323,8 @@ const SelfScoring = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Box sx={{ mb: 4 }}>
           <Typography variant="h2">Self Scoring - {getCurrentStepTitle()}</Typography>
-          <Typography variant="body1" color="text.secondary">Start scoring now.</Typography>
+          {step === 1 && <Typography variant="body1" color="text.secondary">Start scoring now.</Typography>}
+          {step === 2 && <Typography variant="body1" color="text.secondary">Hello {currentClimber.name}, points await you.</Typography>}
         </Box>
         {step === 2 && (
           <Button
