@@ -5,7 +5,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 
 // Pages
-import Dashboard from './pages/Dashboard/Dashboard';
+import Landing from './pages/Landing/Landing';
 import Climbers from './pages/Climbers/Climbers';
 import SelfScoring from './pages/SelfScoring/SelfScoring';
 import ClimberProfile from './pages/ClimberProfile';
@@ -21,7 +21,7 @@ function App() {
         <Header />
         <Container>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/climbers" element={<Climbers />} />
             <Route path="/self-scoring" element={<SelfScoring />} />
             <Route path="/self-scoring/:climberId" element={<SelfScoring />} />

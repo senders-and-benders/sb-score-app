@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Typography } from '@mui/material';
-import AscentCard from '../../components/AscentCard/AscentCard';
 import SelectionGrid from '../../components/SelectionGrid';
-import ClimberProfileCard from '../../components/ClimberProfileCard/ClimberProfileCard';
-import Button from '../../components/ui/Button';
+import ClimberProfileCard from '../../components/ClimberProfileCard';
+import Button from '../../components/Button';
+import ClimbingLog from '../../components/ClimbingLog/ClimbingLog';
 
 const SelfScoring = () => {
   const { climberId: urlClimberId } = useParams(); // Get climber ID from URL
@@ -318,9 +318,17 @@ const SelfScoring = () => {
 
   return (
     <Box sx={{ my: 5 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h2">Self Scoring - {getCurrentStepTitle()}</Typography>
-        <Typography variant="body1" color="text.secondary">Start scoring now.</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h2">Self Scoring - {getCurrentStepTitle()}</Typography>
+          <Typography variant="body1" color="text.secondary">Start scoring now.</Typography>
+        </Box>
+        {step === 2 && (
+          <Button
+            label='Select Climber'
+            onClick={resetToClimberSelection}
+          />
+        )}
       </Box>
 
       {error && <div className="error">{error}</div>}
@@ -337,13 +345,6 @@ const SelfScoring = () => {
         </Box>
       )}
 
-      {step === 2 && (
-        <Button
-          label="Select Climber"
-          onClick={resetToClimberSelection}
-          sx={{ my: 4 }}
-        />
-      )}
 
       {/* Progress indicator */}
       {step > 1 && (
@@ -351,10 +352,10 @@ const SelfScoring = () => {
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Box>
               <Typography component="span" fontWeight="bold">
-                {currentClimber?.name}
+                Route: 
               </Typography>
               {selections.gym_id && (
-                <Typography component="span"> &rarr; {getSelectedGymName()}</Typography>
+                <Typography component="span"> {getSelectedGymName()}</Typography>
               )}
               {selections.gym_area_id && (
                 <Typography component="span"> &rarr; {getSelectedAreaName()}</Typography>
@@ -517,12 +518,7 @@ const SelfScoring = () => {
           <div className="card">
             <Typography variant="h3">Your Recent Scores</Typography>
             {scores.length > 0 ? (
-              scores.slice(0, 5).map(score => (
-                <AscentCard
-                  score={score} 
-                  onDelete={handleDeleteScore} 
-                />
-              ))
+              <ClimbingLog scores={scores.slice(0, 10)} onDelete={handleDeleteScore} />
             ) : (
               <p>No scores recorded yet. Submit your first climb above!</p>
             )}
@@ -530,8 +526,7 @@ const SelfScoring = () => {
             {scores.length > 3 && (
               <Button
                 label={`View All Scores (${scores.length})`}
-                onClick={() => navigate(`/climber-profile/${climberId}`)}
-                style={{ marginTop: '10px' }}
+                path={`/climber-profile/${climberId}`}
               />
             )}
           </div>

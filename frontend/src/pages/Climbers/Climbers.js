@@ -7,9 +7,9 @@ import { Box, Typography, Divider } from '@mui/material';
 import { Add } from '@mui/icons-material';
 
 // Components
-import ClimberProfileCard from '../../components/ClimberProfileCard/ClimberProfileCard'; 
-import Button from '../../components/ui/Button';
-import AddClimberForm from '../../components/AddClimberForm/AddClimberForm';
+import ClimberProfileCard from '../../components/ClimberProfileCard'; 
+import Button from '../../components/Button';
+import AddClimberForm from '../../components/AddClimberForm';
 
 // CSS
 import './Climbers.css'; 

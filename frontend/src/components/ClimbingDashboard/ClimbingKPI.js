@@ -12,11 +12,11 @@ theme = responsiveFontSizes(theme);
 
 export const ClimbingKPIContainer = ({ children, title }) => (
   <Paper 
-    elevation={3} 
+    elevation={1} 
     sx={{ 
       p: 2, 
       width: '90%',
-      height: 200,
+      maxheight: 200,
       display: 'flex',
       flexDirection: 'column'
     }}
