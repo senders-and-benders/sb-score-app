@@ -8,7 +8,6 @@ import { Add } from '@mui/icons-material';
 
 // Components
 import ClimberProfileCard from '../../components/ClimberProfileCard'; 
-import Button from '../../components/Button';
 import AddClimberForm from '../../components/AddClimberForm';
 
 // CSS

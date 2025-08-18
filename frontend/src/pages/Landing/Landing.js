@@ -5,14 +5,12 @@ import Divider from '@mui/material/Divider';
 
 // Icons
 import AddIcon from '@mui/icons-material/Add';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TerrainIcon from '@mui/icons-material/Terrain';
 import PersonIcon from '@mui/icons-material/Person';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 
 // Components
 import Button from '../../components/Button';
-import RecentActivityFeed from '../../components/RecentActivityFeed';
 
 
 const Dashboard = () => {

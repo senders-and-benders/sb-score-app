@@ -19,7 +19,7 @@ const Navigation = () => {
       underline={location.pathname === '/dashboard' ? 'always' : 'hover'}
       variant='subtitle1'
       >
-        Dashboard
+        Home
       </Link>
       <Link 
         href="/climbers" 

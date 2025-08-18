@@ -17,14 +17,16 @@ const Header = () => {
           spacing={3}
         >
           {/* Left Icon */}
-          <img
-            src={logo}
-            alt="Logo"
-            style={{
-              height: 75, // 50px for phones, 100px otherwise
-              padding: 1
-            }}
-          />
+          <a href="/">
+            <img
+              src={logo}
+              alt="Logo"
+              style={{
+                height: 75, // 50px for phones, 100px otherwise
+                padding: 1
+              }}
+            />
+          </a>
 
           {/* Right Navigation */}
           <Navigation />

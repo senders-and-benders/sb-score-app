@@ -6,6 +6,7 @@ import SelectionGrid from '../../components/SelectionGrid';
 import ClimberProfileCard from '../../components/ClimberProfileCard';
 import Button from '../../components/Button';
 import ClimbingLog from '../../components/ClimbingLog/ClimbingLog';
+import AddClimberForm from '../../components/AddClimberForm';
 
 const SelfScoring = () => {
   const { climberId: urlClimberId } = useParams(); // Get climber ID from URL
@@ -320,17 +321,19 @@ const SelfScoring = () => {
 
   return (
     <Box sx={{ my: 5 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Box sx={{ mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <Box>
           <Typography variant="h2">Self Scoring - {getCurrentStepTitle()}</Typography>
           {step === 1 && <Typography variant="body1" color="text.secondary">Start scoring now.</Typography>}
           {step === 2 && <Typography variant="body1" color="text.secondary">Hello {currentClimber.name}, points await you.</Typography>}
         </Box>
-        {step === 2 && (
+        {step === 2 ? (
           <Button
             label='Select Climber'
             onClick={resetToClimberSelection}
           />
+        ) : (
+          <AddClimberForm onAddClimber={fetchInitialData} />
         )}
       </Box>
 
@@ -338,8 +341,7 @@ const SelfScoring = () => {
 
       {/* Step 1: Select Climber */}
       {step === 1 && (
-        <Box className="card">
-          <Typography variant="h3">Select Your Name</Typography>
+        <Box className="card" sx={{ my: 5 }}>
           <Box className="climber-list">
             {climbers.map(climber => (
               <ClimberProfileCard key={climber.id} climber={climber} onClickOverride={() => handleClimberSelect(climber.id.toString())} />
