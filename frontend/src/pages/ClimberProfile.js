@@ -77,7 +77,7 @@ const Scores = () => {
 
       {/* Dashboard */}
       <Box className="card" >
-        <Typography my={2} variant='h3'>Climbing Dashboard - Last 30 Days</Typography>
+        <Typography my={2} variant='h3'>Climbing Dashboard</Typography>
         <ClimbingKPIChart climberID={climberId} refreshTrigger={refreshTrigger}/>
       </Box>
 

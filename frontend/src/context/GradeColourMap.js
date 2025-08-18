@@ -1,5 +1,5 @@
 // Colours
-const COLOURS = {
+export const GRADE_COLOURS = {
   'Yellow': '#FFE066',   // Soft yellow
   'Blue': '#339AF0',     // Vibrant blue
   'Purple': '#845EF7',   // Pleasant purple
@@ -11,26 +11,26 @@ const COLOURS = {
 };
 
 // Apply a rope level mapping
-const ROPE_COLOUR_MAP = {
-  '10+': COLOURS['Yellow'],
-  '14': COLOURS['Blue'],
-  '15': COLOURS['Blue'],
-  '16': COLOURS['Purple'],
-  '17': COLOURS['Purple'],
-  '18': COLOURS['Green'],
-  '19': COLOURS['Green'],
-  '20': COLOURS['Orange'],
-  '21': COLOURS['Orange'],
-  '22': COLOURS['Red'],
-  '23': COLOURS['Red'],
-  '24': COLOURS['Black'],
-  '25': COLOURS['Black'],
-  '26': COLOURS['White']
+export const ROPE_COLOUR_MAP = {
+  '10+': GRADE_COLOURS['Yellow'],
+  '14': GRADE_COLOURS['Blue'],
+  '15': GRADE_COLOURS['Blue'],
+  '16': GRADE_COLOURS['Purple'],
+  '17': GRADE_COLOURS['Purple'],
+  '18': GRADE_COLOURS['Green'],
+  '19': GRADE_COLOURS['Green'],
+  '20': GRADE_COLOURS['Orange'],
+  '21': GRADE_COLOURS['Orange'],
+  '22': GRADE_COLOURS['Red'],
+  '23': GRADE_COLOURS['Red'],
+  '24': GRADE_COLOURS['Black'],
+  '25': GRADE_COLOURS['Black'],
+  '26': GRADE_COLOURS['White']
 };
 
 // Put it as one since we might show ropes and boulders under one graph
 export const GRADE_COLOUR_MAPPING = {
-  ...COLOURS,
+  ...GRADE_COLOURS,
   ...ROPE_COLOUR_MAP
 };
 

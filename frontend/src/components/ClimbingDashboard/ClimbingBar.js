@@ -7,10 +7,9 @@ const ClimbingKPIContainer = ({ children, title }) => (
   <Paper 
     elevation={1} 
     sx={{ 
-      p: 2, 
       display: 'inline-block', 
       minWidth: 200, 
-      width: '90%'
+      width: '100%'
     }}
   >
     <Typography variant="subtitle2" color="text.secondary">

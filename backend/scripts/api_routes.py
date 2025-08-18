@@ -25,18 +25,24 @@ def get_climber_stats_last_30_days_metrics(climber_id):
     kpi_query = '''
     SELECT 
 	    count(*) as total_climbs,
-	    sum(score) as total_score
+	    sum(score) as total_score,
+        count(distinct date_recorded) as total_days_climbed,
+        cast(count(*) as decimal(10,2)) / count(distinct date_recorded) as daily_avg_climbs_completed
     FROM vw_completed_climbs_last_30_days
     WHERE climber_id = %s
     '''
     kpis = create_connection_and_query(kpi_query, params=(climber_id,), fetch_one=True)
     total_climbs = kpis['total_climbs']
     total_points = kpis['total_score']
+    total_days_climbed = kpis['total_days_climbed']
+    daily_avg_climbs_completed = kpis['daily_avg_climbs_completed']
     latest_and_greatest_climb_data = create_connection_and_query('SELECT * FROM vw_completed_climbs_last_30_days WHERE climber_id = %s AND best_climb_rank = 1', params=(climber_id,), fetch_one=True)
 
     return jsonify({
         'totalClimbs': total_climbs,
         'totalPoints': total_points,
+        'totalDaysClimbed': total_days_climbed,
+        'dailyAvgClimbsCompleted': daily_avg_climbs_completed,
         'latestAndGreatestClimb': latest_and_greatest_climb_data,
     })
 
@@ -60,6 +66,16 @@ def get_climber_stats_last_30_days_data(climber_id):
     data_query = '''
     SELECT *
     FROM vw_completed_climbs_last_30_days
+    WHERE climber_id = %s
+    '''
+    data = create_connection_and_query(data_query, params=(climber_id,), fetch_all=True)
+    return jsonify(data)
+
+@routes_blueprint.route('/api/stats/climber/<int:climber_id>/avg_grade_last_60_days')
+def avg_grade_last_60_days(climber_id):
+    data_query = '''
+    SELECT *
+    FROM vw_avg_grade_last_60_days
     WHERE climber_id = %s
     '''
     data = create_connection_and_query(data_query, params=(climber_id,), fetch_all=True)

@@ -90,7 +90,8 @@ def init_db():
         print('Creating views...')
         views = [
             'vw_completed_climbs',
-            'vw_completed_climbs_last_30_days'
+            'vw_completed_climbs_last_30_days',
+            'vw_avg_grade_last_60_days'
         ] # ORDER IS IMPORTANT OR ELSE IT MAY BREAK. THIS MAY GET UNWIELDY LATER
         for view_name in views:
             create_view_from_sql(conn, view_name)

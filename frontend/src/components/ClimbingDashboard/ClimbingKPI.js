@@ -14,9 +14,9 @@ export const ClimbingKPIContainer = ({ children, title }) => (
   <Paper 
     elevation={1} 
     sx={{ 
-      p: 2, 
-      width: '90%',
+      width: '100%',
       maxheight: 200,
+      minHeight: 150,
       display: 'flex',
       flexDirection: 'column'
     }}

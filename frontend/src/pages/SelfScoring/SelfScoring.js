@@ -519,7 +519,13 @@ const SelfScoring = () => {
 
           {/* Recent Scores */}
           <div className="card">
-            <Typography variant="h3">Your Recent Scores</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h3">Your Recent Scores</Typography>
+              <Button
+                label='Climber Profile'
+                path={`/climber-profile/${climberId}`}
+              />
+            </Box>
             {scores.length > 0 ? (
               <ClimbingLog scores={scores.slice(0, 10)} onDelete={handleDeleteScore} />
             ) : (
