@@ -23,103 +23,103 @@ gym_id,gym_area_id,wall_name,wall_number
 3,4,Latte,1
 3,4,Jawa,1
 3,4,Graceland,1
-3,5,TBD - 1,1
-3,5,TBD - 1,2
-3,5,TBD - 1,3
-3,5,TBD - 1,4
-3,5,TBD - 1,5
-3,5,TBD - 1,6
-3,5,TBD - 1,7
-3,5,TBD - 1,8
-3,5,TBD - 1,9
-3,5,TBD - 1,10
-3,5,TBD - 1,11
-3,5,TBD - 1,12
-3,5,TBD - 1,13
-3,5,TBD - 1,14
-3,5,TBD - 1,15
-3,5,TBD - 1,16
-3,5,TBD - 1,17
-3,5,TBD - 1,18
-3,5,TBD - 1,19
-3,5,TBD - 1,20
-3,5,TBD - 2,21
-3,5,TBD - 2,22
-3,5,TBD - 2,23
-3,5,TBD - 2,24
-3,5,TBD - 2,25
-3,5,TBD - 2,26
-3,5,TBD - 2,27
-3,5,TBD - 2,28
-3,5,TBD - 2,29
-3,5,TBD - 2,30
-3,5,TBD - 2,31
-3,5,TBD - 2,32
-3,5,TBD - 2,33
-3,5,TBD - 2,34
-3,5,TBD - 2,35
-3,5,TBD - 2,36
-3,5,TBD - 2,37
-3,5,TBD - 2,38
-3,5,TBD - 2,39
-3,5,TBD - 2,40
-3,5,TBD - 3,41
-3,5,TBD - 3,42
-3,5,TBD - 3,43
-3,5,TBD - 3,44
-3,5,TBD - 3,45
-3,5,TBD - 3,46
-3,5,TBD - 3,47
-3,5,TBD - 3,48
-3,5,TBD - 3,49
-3,5,TBD - 3,50
-3,5,TBD - 3,51
-3,5,TBD - 3,52
-3,5,TBD - 3,53
-3,5,TBD - 3,54
-3,5,TBD - 3,55
-3,5,TBD - 3,56
-3,5,TBD - 3,57
-3,5,TBD - 3,58
-3,5,TBD - 3,59
-3,5,TBD - 3,60
-3,5,TBD - 4,61
-3,5,TBD - 4,62
-3,5,TBD - 4,63
-3,5,TBD - 4,64
-3,5,TBD - 4,65
-3,5,TBD - 4,66
-3,5,TBD - 4,67
-3,5,TBD - 4,68
-3,5,TBD - 4,69
-3,5,TBD - 4,70
-3,5,TBD - 4,71
-3,5,TBD - 4,72
-3,5,TBD - 4,73
-3,5,TBD - 4,74
-3,5,TBD - 4,75
-3,5,TBD - 4,76
-3,5,TBD - 4,77
-3,5,TBD - 4,78
-3,5,TBD - 4,79
-3,5,TBD - 4,80
-3,5,TBD - 5,81
-3,5,TBD - 5,82
-3,5,TBD - 5,83
-3,5,TBD - 5,84
-3,5,TBD - 5,85
-3,5,TBD - 5,86
-3,5,TBD - 5,87
-3,5,TBD - 5,88
-3,5,TBD - 5,89
-3,5,TBD - 5,90
-3,5,TBD - 5,91
-3,5,TBD - 5,92
-3,5,TBD - 5,93
-3,5,TBD - 5,94
-3,5,TBD - 5,95
-3,5,TBD - 5,96
-3,5,TBD - 5,97
-3,5,TBD - 5,98
-3,5,TBD - 5,99
-3,5,TBD - 6,100
+3,5,Waterfall,1
+3,5,Waterfall,2
+3,5,Waterfall,3
+3,5,Waterfall,4
+3,5,Waterfall,5
+3,5,Waterfall,6
+3,5,Waterfall,7
+3,5,Waterfall,8
+3,5,Waterfall,9
+3,5,Waterfall,10
+3,5,Martini,11
+3,5,Martini,12
+3,5,Martini,13
+3,5,Martini,14
+3,5,Martini,15
+3,5,Martini,16
+3,5,Martini,17
+3,5,Martini,18
+3,5,Martini,19
+3,5,Martini,20
+3,5,Martini,21
+3,5,Martini,22
+3,5,Wave,23
+3,5,Wave,24
+3,5,Wave,25
+3,5,Wave,26
+3,5,Wave,27
+3,5,Wave,28
+3,5,Wave,29
+3,5,Wave,30
+3,5,Wave,31
+3,5,Wave,32
+3,5,Wave,33
+3,5,Wave,34
+3,5,Nursery,35
+3,5,Nursery,36
+3,5,Nursery,37
+3,5,Nursery,38
+3,5,Nursery,39
+3,5,Nursery,40
+3,5,Nursery,41
+3,5,Nursery,42
+3,5,Nursery,43
+3,5,2020 Wall,44
+3,5,2020 Wall,45
+3,5,2020 Wall,46
+3,5,2020 Wall,47
+3,5,2020 Wall,48
+3,5,2020 Wall,49
+3,5,2020 Wall,50
+3,5,2020 Wall,51
+3,5,2020 Wall,52
+3,5,2020 Wall,53
+3,5,2020 Wall,54
+3,5,2020 Wall,55
+3,5,2020 Wall,56
+3,5,2020 Wall,57
+3,5,2020 Wall,58
+3,5,2020 Wall,59
+3,5,2020 Wall,60
+3,5,2020 Wall,61
+3,5,Wonderwall,62
+3,5,Wonderwall,63
+3,5,Wonderwall,64
+3,5,Wonderwall,65
+3,5,Wonderwall,66
+3,5,Wonderwall,67
+3,5,Wonderwall,68
+3,5,Wonderwall,69
+3,5,The Arch,70
+3,5,The Arch,71
+3,5,The Arch,72
+3,5,The Arch,73
+3,5,The Arch,74
+3,5,The Arch,75
+3,5,The Arch,76
+3,5,The Arch,77
+3,5,The Arch,78
+3,5,The Arch,79
+3,5,The Arch,80
+3,5,The Arch,81
+3,5,The Arch,82
+3,5,The Arch,83
+3,5,The Arch,84
+3,5,The Arch,85
+3,5,The Arch,86
+3,5,The Arch,87
+3,5,The Arch,88
+3,5,The Arch,89
+3,5,The Arch,90
+3,5,The Arch,91
+3,5,The Arch,92
+3,5,The Arch,93
+3,5,The Arch,94
+3,5,The Arch,95
+3,5,The Arch,96
+3,5,The Arch,97
+3,5,The Arch,98
+3,5,The Arch,99
+3,5,The Arch,100
