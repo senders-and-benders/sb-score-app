@@ -11,6 +11,10 @@
       gtag('config', 'G-SVVVCRFFP6', {
         send_page_view: false  // 👈 important! prevents double-counting
       });
+
+      // Debug: Log when gtag is ready
+      console.log('🚀 Google Analytics gtag initialized');
+      console.log('gtag function available:', typeof gtag !== 'undefined');
     </script>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/snb_logo.ico" />

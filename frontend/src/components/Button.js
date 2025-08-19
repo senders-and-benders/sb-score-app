@@ -23,6 +23,8 @@ const Button = ({
   const navigate = useNavigate();
 
   const handleClick = (event) => {
+    console.log("🔘 Button clicked:", label); // Debug log
+    
     // If there's a path, navigate
     if (path) {
       navigate(path);
