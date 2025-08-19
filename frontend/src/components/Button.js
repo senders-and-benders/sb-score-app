@@ -8,6 +8,7 @@ import {
   DialogActions, 
   Typography 
 } from '@mui/material';
+import { trackEvent } from '../utils/analytics';
 
 const Button = ({
   colour,
@@ -20,15 +21,27 @@ const Button = ({
 }) => {
   // Handle navigation logic in parent
   const navigate = useNavigate();
+
   const handleClick = (event) => {
     // If there's a path, navigate
     if (path) {
       navigate(path);
+      trackEvent(
+        "button_click", {
+          button_label: label,
+          button_type: 'navigate',
+          path: path
+        });
     }
     
     // If there's an onClick prop, call it
     if (otherProps.onClick) {
       otherProps.onClick(event);
+      trackEvent(
+        "button_click", {
+          button_label: label,
+          button_type: 'action'
+        });
     }
   };
   return (

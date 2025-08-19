@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // App components
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import AnalyticsTracker from './components/AnalyticsTracker';
 
 // Pages
 import Landing from './pages/Landing/Landing';
@@ -17,8 +18,8 @@ import { Container } from '@mui/material';
 function App() {
   return (
     <Router>
-      {/* <div className="App"> */}
         <Header />
+        <AnalyticsTracker />
         <Container>
           <Routes>
             <Route path="/" element={<Landing />} />
@@ -30,7 +31,6 @@ function App() {
           </Routes>
           <Footer />
         </Container>
-      {/* </div> */}
     </Router>
   );
 }
