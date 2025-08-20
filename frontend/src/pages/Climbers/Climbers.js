@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // MUI components
-import { Box, Typography, Divider } from '@mui/material';
-import { Add } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
 
 // Components
 import ClimberProfileCard from '../../components/ClimberProfileCard'; 
@@ -16,11 +14,8 @@ import './Climbers.css';
 
 const Climbers = () => {
   const [climbers, setClimbers] = useState([]);
-  const [newClimber, setNewClimber] = useState({ name: '', email: '', nickname: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const navigate = useNavigate();
 
   const fetchClimbers = useCallback(async () => {
     try {
@@ -38,6 +33,7 @@ const Climbers = () => {
   }, [fetchClimbers]);
 
   if (loading) return <div className="loading">Loading climbers...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <Box my={5}>

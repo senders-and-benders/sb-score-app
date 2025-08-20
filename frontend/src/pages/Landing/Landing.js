@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Typography, Chip, Stack, Grid, Paper, Container } from '@mui/material';
-import Divider from '@mui/material/Divider';
+import { Box, Typography, Stack, Grid, Container } from '@mui/material';
 
 // Icons
-import AddIcon from '@mui/icons-material/Add';
 import TerrainIcon from '@mui/icons-material/Terrain';
 import PersonIcon from '@mui/icons-material/Person';
 import ShowChartIcon from '@mui/icons-material/ShowChart';

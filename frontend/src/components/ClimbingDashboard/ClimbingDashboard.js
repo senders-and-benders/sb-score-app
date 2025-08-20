@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, Grid, CircularProgress, Stack } from '@mui/material'
+import { Box, Card, CardContent, Typography, Grid, CircularProgress } from '@mui/material'
 import axios from 'axios';
 import { ClimbingKPI, ClimbingKPIText } from './ClimbingKPI';
 import { GroupedBarChart } from './ClimbingBar';
@@ -20,7 +20,7 @@ const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
 
   useEffect(() => {
     fetchScoresData();
-  }, [climberID, refreshTrigger]);
+  }, [refreshTrigger]);
 
   const fetchScoresData = async () => {
     try {
@@ -48,7 +48,6 @@ const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
       const avgBoulderingData = avgGradeData.find(climb => climb.climb_type === 'Bouldering');
       const avgRopesData = avgGradeData.find(climb => climb.climb_type === 'Ropes');
 
-      console.log(avgBoulderingData);
       setAvgGradeData({
         all: avgOverallData,
         bouldering: avgBoulderingData,

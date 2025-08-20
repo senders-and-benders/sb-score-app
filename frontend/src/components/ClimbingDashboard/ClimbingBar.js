@@ -45,7 +45,7 @@ export const GroupedBarChart = ({ climbs, title }) => {
     .sort((a, b) => GRADE_ORDERING.indexOf(a.grade) - GRADE_ORDERING.indexOf(b.grade));
 
     setGroupedScores(flatGrouped);
-  }, []);
+  }, [climbs]);
 
   return (
   <ClimbingKPIContainer title={title}>

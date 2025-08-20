@@ -1,13 +1,5 @@
-import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Button as MuiButton, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Typography 
-} from '@mui/material';
+import { Button as MuiButton } from '@mui/material';
 import { trackEvent } from '../utils/analytics';
 
 const Button = ({

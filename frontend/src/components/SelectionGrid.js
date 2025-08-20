@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Box } from '@mui/material';
+import { Typography } from '@mui/material';
 
 // Reusable Selection Component
 const SelectionGrid = ({ title, items, onSelect, selectedValue, keyField, displayField, colorScheme, minWidth = '120px' }) => {

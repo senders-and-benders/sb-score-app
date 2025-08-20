@@ -1,6 +1,5 @@
 import React from 'react';
-import { Stack, Container , Box, Tooltip, Typography } from '@mui/material';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { Stack, Container , Box} from '@mui/material';
 import Navigation from '../Navigation';
 import logo from '../../assets/white_snb_text.png'
 import './Header.css';
