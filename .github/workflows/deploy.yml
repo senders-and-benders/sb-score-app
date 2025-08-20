@@ -40,10 +40,12 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       # Deploy with Railway (install CLI via GitHub Action)
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      # Deploy to Railway
       - name: Deploy to Railway
-        uses: railwayapp/railway-action@v0
-        with:
-          service: ${{ secrets.RAILWAY_SERVICE_ID }}
-          project: ${{ secrets.RAILWAY_PROJECT_ID }}
-          token: ${{ secrets.RAILWAY_API_TOKEN }}
-          path: backend
+        run: railway up --service=${{ secrets.RAILWAY_SERVICE_ID }}
+        working-directory: backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} # 3
