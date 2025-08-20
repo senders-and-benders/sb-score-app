@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate  } from 'react-router-dom';
 import axios from 'axios';
 
 // MUI components
 import { Box, Typography } from '@mui/material';
 
 // Components
-import ClimberProfileCard from '../../components/ClimberProfileCard'; 
+import ClimberProfileGrid from '../../components/ClimberCardGrid/ClimberProfileGrid'; 
 import AddClimberForm from '../../components/AddClimberForm';
 
 // CSS
@@ -16,6 +17,8 @@ const Climbers = () => {
   const [climbers, setClimbers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   const fetchClimbers = useCallback(async () => {
     try {
@@ -57,9 +60,11 @@ const Climbers = () => {
         <Typography variant='caption' color='text.secondary'><i>To delete or update your profile, talk to admin.</i></Typography>
 
         <Box className="climber-list">
-          {climbers.map(climber => (
-            <ClimberProfileCard key={climber.id} climber={climber} />
-          ))}
+            <ClimberProfileGrid 
+              climbers={climbers} 
+              loading={loading} 
+              onClimberClick={(id) => navigate(`/climber-profile/${id}`)}
+            />
         </Box>
       </Box>
       

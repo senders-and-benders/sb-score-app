@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stack, Container , Box} from '@mui/material';
-import Navigation from '../Navigation';
+import Navigation from './Navigation';
 import logo from '../../assets/white_snb_text.png'
 import './Header.css';
 

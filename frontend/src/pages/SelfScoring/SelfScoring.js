@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Typography } from '@mui/material';
-import SelectionGrid from '../../components/SelectionGrid';
-import ClimberProfileCard from '../../components/ClimberProfileCard';
+import SelectionGrid from '../../components/ScoreSelection/SelectionGrid';
+import ClimberProfileGrid from '../../components/ClimberCardGrid/ClimberProfileGrid';
 import Button from '../../components/Button';
 import ClimbingLog from '../../components/ClimbingLog/ClimbingLog';
 import AddClimberForm from '../../components/AddClimberForm';
@@ -352,9 +352,11 @@ const SelfScoring = () => {
       {step === 1 && (
         <Box className="card" sx={{ my: 5 }}>
           <Box className="climber-list">
-            {climbers.map(climber => (
-              <ClimberProfileCard key={climber.id} climber={climber} onClickOverride={() => handleClimberSelect(climber.id.toString())} />
-            ))}
+            <ClimberProfileGrid 
+              climbers={climbers} 
+              onClimberClick={handleClimberSelect}
+              loading={loading} 
+            />
           </Box>
         </Box>
       )}
