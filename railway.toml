@@ -1,8 +1,34 @@
 [build]
 builder = "NIXPACKS"
-nixpacksPlan = {"providers":["..."]}
+
+# Watch both frontend and backend folders
+watchPatterns = ["frontend/**", "backend/**"]
+
+[build.nixpacksPlan]
+# Tell Nixpacks we need both Node and Python
+providers = ["node", "python"]
+
+[build.nixpacksPlan.phases.install]
+cmds = [
+  # Install frontend dependencies
+  "npm --prefix frontend ci",
+  # Install backend dependencies
+  "pip install -r backend/requirements.txt"
+]
+
+[build.nixpacksPlan.phases.build]
+dependsOn = ["install"]
+cmds = [
+  # Build frontend
+  "npm --prefix frontend run build",
+  # Copy into Flask's static directory (adjust if needed)
+  "mkdir -p backend/build",
+  "cp -r frontend/build/* backend/build/"
+]
 
 [deploy]
+# Start the Flask app (Gunicorn recommended in production)
+startCommand = "gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT"
 runtime = "V2"
 numReplicas = 1
 sleepApplication = false
