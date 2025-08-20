@@ -24,6 +24,8 @@ jobs:
           npm ci
           npm run build
           cd ..
+        env:
+          CI: false
 
       - name: Copy frontend build into Flask backend
         run: |
@@ -48,4 +50,4 @@ jobs:
         run: railway up --service=${{ secrets.RAILWAY_SERVICE_ID }}
         working-directory: backend
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }} # 3
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
