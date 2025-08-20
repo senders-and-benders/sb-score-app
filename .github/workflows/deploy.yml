@@ -8,11 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
-
-    env:
-      SVC_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
 
     steps:
       - uses: actions/checkout@v3
@@ -42,9 +37,13 @@ jobs:
           python-version: "3.10"
 
       - name: (Optional) Install Flask + Run Tests
-        run: |
-          pip install -r backend/requirements.txt
-          # pytest, linting, etc.
+        run: pip install -r backend/requirements.txt
 
+      # Deploy with Railway (install CLI via GitHub Action)
       - name: Deploy to Railway
-        run: railway up --service=${{ env.SVC_ID }}
+        uses: railwayapp/railway-action@v0
+        with:
+          service: ${{ secrets.RAILWAY_SERVICE_ID }}
+          project: ${{ secrets.RAILWAY_PROJECT_ID }}
+          token: ${{ secrets.RAILWAY_API_TOKEN }}
+          path: backend
