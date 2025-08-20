@@ -1,0 +1,50 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches:
+      - main   # or your deploy branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+
+    env:
+      SVC_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Install Node and build frontend
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.18.0
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+          cd ..
+
+      - name: Copy frontend build into Flask backend
+        run: |
+          mkdir -p backend/build
+          cp -r frontend/build/* backend/build/
+
+      # Install Python for Flask
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: (Optional) Install Flask + Run Tests
+        run: |
+          pip install -r backend/requirements.txt
+          # pytest, linting, etc.
+
+      - name: Deploy to Railway
+        run: railway up --service=${{ env.SVC_ID }}
