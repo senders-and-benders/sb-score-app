@@ -1,24 +1,23 @@
-name: Deploy to Railway
+name: Build and Deploy to Railway
 
 on:
   push:
     branches:
-      - main   # or your deploy branch
+      - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Install Node and build frontend
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 22.18.0
 
-      - name: Build frontend
+      - name: Install dependencies and build frontend
         run: |
           cd frontend
           npm ci
@@ -27,25 +26,41 @@ jobs:
         env:
           CI: false
 
-      - name: Copy frontend build into Flask backend
+      - name: Copy frontend build to backend
         run: |
           mkdir -p backend/build
           cp -r frontend/build/* backend/build/
 
-      # Install Python for Flask
+      - name: Upload backend build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-build
+          path: backend/build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download backend build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-build
+          path: backend/build
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: (Optional) Install Flask + Run Tests
+      - name: Install backend dependencies
         run: pip install -r backend/requirements.txt
 
-      # Deploy with Railway (install CLI via GitHub Action)
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      # Deploy to Railway
       - name: Deploy to Railway
         run: railway up --service=${{ secrets.RAILWAY_SERVICE_ID }}
         working-directory: backend
