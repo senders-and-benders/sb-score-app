@@ -50,4 +50,4 @@ jobs:
         run: railway up --service=${{ secrets.RAILWAY_SERVICE_ID }}
         working-directory: backend
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
