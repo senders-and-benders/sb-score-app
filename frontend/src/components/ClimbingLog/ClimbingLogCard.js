@@ -116,6 +116,16 @@ const ClimbingLogCard = ({
               </Typography>
             </Grid>
           )}
+          {score.notes && (
+            <Grid size={{xs: 12, md: 12}}>
+              <Typography variant="body2" color="text.secondary">
+                Notes
+              </Typography>
+              <Typography variant="body2">
+                {score.notes}
+              </Typography>
+            </Grid>
+          )}
         </Grid>
       </CardContent>
     </Card>

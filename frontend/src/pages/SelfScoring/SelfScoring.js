@@ -16,12 +16,12 @@ const SelfScoring = () => {
   const [currentClimber, setCurrentClimber] = useState(null);
   const [climbers, setClimbers] = useState([]);
   // Route
-  const [gyms, setGyms] = useState([]);
-  const [gymAreas, setGymAreas] = useState([]);
-  const [wallAreas, setWallAreas] = useState([]);
+  const [gyms, setGyms] = useState([]); // West End
+  const [gymAreas, setGymAreas] = useState([]); // Rope Hall or Boulderhall
+  const [wallAreas, setWallAreas] = useState([]); // Martini if Ropes or Graceland for bouldering
   const [climbType, setClimbType] = useState('');
-  const [walls, setWalls] = useState([]);
-  const [ropeNumbers, setRopeNumbers] = useState([]);
+  const [walls, setWalls] = useState([]); // #24 for Martini or Graceland for bouldering
+  const [ropeNumbers, setRopeNumbers] = useState([]); // #24 for Martini
   const [grades, setGrades] = useState([]);
   // Scores
   const [scores, setScores] = useState([]);
@@ -95,6 +95,11 @@ const SelfScoring = () => {
     try {
       // Walls
       if (gymAreaId) {
+        // Get the current area's climb type to alter the selection flow logic
+        const selectedGymArea = gymAreas.find(area => area.id === parseInt(gymAreaId));
+        const climbType = selectedGymArea.climb_type;
+        setClimbType(climbType);
+        
         const responseWalls = await axios.get(`/api/gym_area/${gymAreaId}/walls`);
         const dataWalls = responseWalls.data;
         
@@ -102,14 +107,18 @@ const SelfScoring = () => {
         setWalls(dataWalls);
         
         // Set wall areas which again do some lazy set to handle both unique bouldering walls and duplicate rope wall names (many rope numbers to one wall name)
-        const wallAreaNames = [ ... new Set(dataWalls.map(wall => wall.wall_name)) ];
-        setWallAreas(wallAreaNames.map(name => ({ wall_name: name })));
-
-        // Get the current area's climb type to alter the selection flow logic
-        const selectedGymArea = gymAreas.find(area => area.id === parseInt(gymAreaId));
-        const climbType = selectedGymArea.climb_type;
-        setClimbType(climbType);
-
+        // Set wall areas as unique combinations of wall_name and rope_wall_name - Some AI voodoo magic here
+        const wallAreaMap = new Map();
+        dataWalls.forEach(wall => {
+          // Use a composite key to ensure uniqueness
+          const key = `${wall.wall_name}|${wall.rope_wall_name}`;
+          if (!wallAreaMap.has(key)) {
+            wallAreaMap.set(key, { wall_name: wall.wall_name, rope_wall_name: wall.rope_wall_name });
+          }
+        });
+        const wallAreasUnique = Array.from(wallAreaMap.values());
+        setWallAreas(wallAreasUnique);
+        
         // Finally get grades
         const responseGrades = await axios.get(`/api/gym_area/${gymAreaId}/grades`);
         setGrades(responseGrades.data);
@@ -416,7 +425,7 @@ const SelfScoring = () => {
                 onSelect={handleWallSelect}
                 selectedValue={selections.wall_area_name}
                 keyField={'wall_name'}
-                displayField={'wall_name'}
+                displayField={climbType === 'Ropes' ? 'rope_wall_name' : 'wall_name'}
                 colorScheme="orange"
               />
             )}

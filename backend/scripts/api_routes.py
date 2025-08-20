@@ -190,14 +190,24 @@ def get_all_gym_areas():
 @routes_blueprint.route('/api/gym_area/<int:gym_area_id>/walls', methods=['GET'])
 def get_gym_area_walls(gym_area_id):
     """Get all walls for a specific gym area"""
-    query = '''
+    query = """
     SELECT 
         w.id,
         w.wall_name,
-        w.wall_number
+        w.wall_number,
+        w.wall_name || ' (' || wall_grouped.min_wall_number || '-' || wall_grouped.max_wall_number || ')' as rope_wall_name
     FROM walls w
+    LEFT JOIN (
+        SELECT 
+            w.wall_name,
+            min(w.wall_number) as min_wall_number,
+            max(w.wall_number) as max_wall_number
+        FROM walls w
+        GROUP BY w.wall_name
+    ) as wall_grouped 
+        ON w.wall_name = wall_grouped.wall_name
     WHERE w.gym_area_id = %s
-    '''
+    """
     params = (gym_area_id,)
     walls = create_connection_and_query(query, params=params, fetch_all=True)
     return jsonify([dict(wall) for wall in walls])
