@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { Typography, Box, Card, Divider } from '@mui/material';
 import {
   Add as AddIcon,
   Terrain as MountainIcon
 } from '@mui/icons-material';
 
+// Services
+import { getClimberScores, deleteScore } from '../services/APIService';
+
+// Components
 import ClimbingKPIChart from '../components/ClimbingDashboard/ClimbingDashboard';
 import ClimbingLog from '../components/ClimbingLog/ClimbingLog';
 import Button from '../components/Button';
@@ -20,12 +23,13 @@ const Scores = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
   // Fetch data
   const fetchClimberScores = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/scores/climber/${climberId}`);
-      setCurrentClimber(response.data.climber);
-      setScores(response.data.scores);
+      const climberScoreData = await getClimberScores(climberId);
+      setCurrentClimber(climberScoreData.climber);
+      setScores(climberScoreData.scores);
       setLoading(false);
     } catch (err) {
       setError('Failed to load climber scores');
@@ -40,7 +44,7 @@ const Scores = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this score?')) {
       try {
-        await axios.delete(`/api/scores/${id}`);
+        await deleteScore(id);
         fetchClimberScores();
         setRefreshTrigger(prev => prev + 1);
       } catch (err) {

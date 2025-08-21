@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from 'axios';
+import { addClimber } from '../services/APIService';
 import {
   Dialog, 
   DialogContent, 
@@ -28,7 +28,7 @@ export default function AddClimberDialog({ onAddClimber }) {
       setError(null);
       
       try {
-        await axios.post('/api/climbers', {
+        await addClimber({
           name: newClimber.name.trim(),
           email: newClimber.email.trim(),
           nickname: newClimber.nickname.trim() || null

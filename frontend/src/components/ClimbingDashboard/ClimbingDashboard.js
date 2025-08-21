@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Card, CardContent, Typography, Grid, CircularProgress } from '@mui/material'
-import axios from 'axios';
+import { getClimberStatsLast30DaysMetrics, getAvgGradeLast60Days, getClimberStatsLast30DaysDailySummary, getClimberStatsLast30DaysData } from '../../services/APIService';
 import { ClimbingKPI, ClimbingKPIText } from './ClimbingKPI';
 import { GroupedBarChart } from './ClimbingBar';
 import { ClimbingGradeGauge } from './ClimbingGradeGauge'
@@ -18,20 +18,12 @@ const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
   const [error, setError] = useState(null);
 
 
-  useEffect(() => {
-    fetchScoresData();
-  }, [refreshTrigger]);
-
-  const fetchScoresData = async () => {
+  const fetchScoresData = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // Last 30 Day Metrics
-      const metrics_response = await axios.get(`/api/stats/climber/${climberID}/last_30_days_metrics`);
-      setClimbingKPIData(metrics_response.data);
-
-      // Latest and greatest climb
-      const latestAndGreatestClimb = metrics_response.data.latestAndGreatestClimb;
+      const metrics_response = await getClimberStatsLast30DaysMetrics(climberID);
+      setClimbingKPIData(metrics_response);
+      const latestAndGreatestClimb = metrics_response.latestAndGreatestClimb;
       setLatestGreatestClimb({
         gym: latestAndGreatestClimb.gym_name,
         gymArea: latestAndGreatestClimb.gym_area_name,
@@ -40,45 +32,34 @@ const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
         attempts: latestAndGreatestClimb.attempts,
         dateRecorded: new Date(latestAndGreatestClimb.date_recorded).toISOString().slice(0, 10)
       });
-
-      // Last 60 Day average grade
-      const avg_grade_response = await axios.get(`/api/stats/climber/${climberID}/avg_grade_last_60_days`);
-      const avgGradeData = avg_grade_response.data;
-      const avgOverallData = avgGradeData.find(climb => climb.climb_type === 'All');
-      const avgBoulderingData = avgGradeData.find(climb => climb.climb_type === 'Bouldering');
-      const avgRopesData = avgGradeData.find(climb => climb.climb_type === 'Ropes');
-
+      const avgGradeDataArr = await getAvgGradeLast60Days(climberID);
       setAvgGradeData({
-        all: avgOverallData,
-        bouldering: avgBoulderingData,
-        ropes: avgRopesData
+        all: avgGradeDataArr.find(climb => climb.climb_type === 'All'),
+        bouldering: avgGradeDataArr.find(climb => climb.climb_type === 'Bouldering'),
+        ropes: avgGradeDataArr.find(climb => climb.climb_type === 'Ropes')
       });
-
-      // Spark Lines
-      const day_response = await axios.get(`/api/stats/climber/${climberID}/last_30_days_daily_summary`);
-      setClimbingDailyData({ 
-        // x-axis: dates as Date objects
-        date: day_response.data.map(item => new Date(item.date)),
-        dailyTotalClimbs: day_response.data.map(item => item.total_climbs),
-        dailyTotalPoints: day_response.data.map(item => item.total_score)
+      const day_response = await getClimberStatsLast30DaysDailySummary(climberID);
+      setClimbingDailyData({
+        date: day_response.map(item => new Date(item.date)),
+        dailyTotalClimbs: day_response.map(item => item.total_climbs),
+        dailyTotalPoints: day_response.map(item => item.total_score)
       });
-
-      //Bar Charts
-      const data_response = await axios.get(`/api/stats/climber/${climberID}/last_30_days_data`);
-      const boulderingData = data_response.data.filter(climb => climb.climb_type === 'Bouldering');
-      const ropesData = data_response.data.filter(climb => climb.climb_type === 'Ropes');
+      const data_response = await getClimberStatsLast30DaysData(climberID);
       setClimbingBarData({
-        bouldering: boulderingData,
-        ropes: ropesData
+        bouldering: data_response.filter(climb => climb.climb_type === 'Bouldering'),
+        ropes: data_response.filter(climb => climb.climb_type === 'Ropes')
       });
-
-      setLoading(false);
+      setError(null);
     } catch (err) {
-      console.error('Error fetching scores:', err);
       setError('Failed to load climbing data');
+    } finally {
       setLoading(false);
     }
-  };
+  }, [climberID]);
+
+  useEffect(() => {
+    fetchScoresData();
+  }, [refreshTrigger, fetchScoresData]);
 
   if (loading) {
     return (

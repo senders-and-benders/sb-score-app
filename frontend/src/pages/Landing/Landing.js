@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Box, Typography, Stack, Grid, Container } from '@mui/material';
+
+// Services
+import { getStats } from '../../services/APIService';
 
 // Icons
 import TerrainIcon from '@mui/icons-material/Terrain';
@@ -26,8 +28,8 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('/api/stats');
-      setStats(response.data);
+  const statsData = await getStats();
+  setStats(statsData);
       setLoading(false);
     } catch (err) {
       setError('Failed to load dashboard stats');

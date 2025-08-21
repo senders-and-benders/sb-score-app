@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate  } from 'react-router-dom';
-import axios from 'axios';
+import { getClimbers } from '../../services/APIService';
 
 // MUI components
 import { Box, Typography } from '@mui/material';
@@ -22,8 +22,8 @@ const Climbers = () => {
 
   const fetchClimbers = useCallback(async () => {
     try {
-      const response = await axios.get('/api/climbers');
-      setClimbers(response.data);
+  const climbersData = await getClimbers();
+  setClimbers(climbersData);
       setLoading(false);
     } catch (err) {
       setError('Failed to load climbers');

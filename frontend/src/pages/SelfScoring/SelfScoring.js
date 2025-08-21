@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { Box, Typography } from '@mui/material';
+
+// Services
+import { 
+  getClimbers, 
+  getGyms, 
+  getGymAreas, 
+  getGymAreaWalls, 
+  getGymAreaGrades, 
+  getClimberScores, 
+  addScore, 
+  deleteScore 
+} from '../../services/APIService';
+
+// Components
 import SelectionGrid from '../../components/ScoreSelection/SelectionGrid';
 import ClimberProfileGrid from '../../components/ClimberCardGrid/ClimberProfileGrid';
 import Button from '../../components/Button';
 import ClimbingLog from '../../components/ClimbingLog/ClimbingLog';
 import AddClimberForm from '../../components/AddClimberForm';
+
 
 const SelfScoring = () => {
   const { climberId: urlClimberId } = useParams(); // Get climber ID from URL
@@ -70,11 +84,11 @@ const SelfScoring = () => {
   const fetchInitialData = async () => {
     try {
       const [climbersRes, gymsRes] = await Promise.all([
-        axios.get('/api/climbers'),
-        axios.get('/api/gyms')
+        getClimbers(),
+        getGyms()
       ]);
-      setClimbers(climbersRes.data);
-      setGyms(gymsRes.data);
+  setClimbers(climbersRes);
+  setGyms(gymsRes);
       setLoading(false);
     } catch (err) {
       setError('Failed to load data');
@@ -84,8 +98,8 @@ const SelfScoring = () => {
 
   const fetchGymAreas = async (gymId) => {
     try {
-      const response = await axios.get(`/api/gym/${gymId}/areas`);
-      setGymAreas(response.data);
+      const response = await getGymAreas(gymId);
+  setGymAreas(response);
     } catch (err) {
       setError('Failed to load gym areas');
     }
@@ -100,8 +114,7 @@ const SelfScoring = () => {
         const climbType = selectedGymArea.climb_type;
         setClimbType(climbType);
         
-        const responseWalls = await axios.get(`/api/gym_area/${gymAreaId}/walls`);
-        const dataWalls = responseWalls.data;
+  const dataWalls = await getGymAreaWalls(gymAreaId);
         
         // Get base data - This will be all walls irrespective of climb type in the area
         setWalls(dataWalls);
@@ -120,8 +133,8 @@ const SelfScoring = () => {
         setWallAreas(wallAreasUnique);
         
         // Finally get grades
-        const responseGrades = await axios.get(`/api/gym_area/${gymAreaId}/grades`);
-        setGrades(responseGrades.data);
+  const gradesData = await getGymAreaGrades(gymAreaId);
+  setGrades(gradesData);
       } else {
         setWallAreas([]);
         setClimbType('');
@@ -135,8 +148,8 @@ const SelfScoring = () => {
     try {
       if (gymAreaId) {
         // Get grades
-        const responseGrades = await axios.get(`/api/gym_area/${gymAreaId}/grades`);
-        setGrades(responseGrades.data);
+  const gradesData = await getGymAreaGrades(gymAreaId);
+  setGrades(gradesData);
       } else {
         setGrades([]);
       }
@@ -147,8 +160,8 @@ const SelfScoring = () => {
 
   const fetchClimberScores = async (climberId) => {
     try {
-      const response = await axios.get(`/api/scores/climber/${climberId}`);
-      setScores(response.data.scores || []);
+  const response = await getClimberScores(climberId);
+  setScores(response.scores || []);
     } catch (err) {
       console.error('Failed to load climber scores', err);
     }
@@ -235,7 +248,7 @@ const SelfScoring = () => {
         notes: scoreDetails.notes
       };
       
-      await axios.post('/api/scores', scoreData);
+  await addScore(scoreData);
       
       // Reset form -- We assume the climber is in the same spot to log the next climb
       setStep(2);
@@ -259,7 +272,7 @@ const SelfScoring = () => {
   const handleDeleteScore = async (scoreId) => {
     if (window.confirm(`Are you sure you want to delete this score? - ${scoreId}`)) {
       try {
-        await axios.delete(`/api/scores/${scoreId}`);
+  await deleteScore(scoreId);
         fetchClimberScores(climberId);
         alert('Score deleted successfully!');
       } catch (err) {
