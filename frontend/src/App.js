@@ -8,7 +8,8 @@ import AnalyticsTracker from './components/AnalyticsTracker';
 // Pages
 import Landing from './pages/Landing/Landing';
 import Climbers from './pages/Climbers/Climbers';
-import SelfScoring from './pages/SelfScoring/SelfScoring';
+import ClimberSelection from './pages/SelfScoring/ClimberSelection';
+import ScoringForm from './pages/SelfScoring/ScoringForm';
 import ClimberProfile from './pages/ClimberProfile';
 import PageNotFound from './pages/PageNotFound/PageNotFound';
 import './App.css';
@@ -24,9 +25,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/climbers" element={<Climbers />} />
-            <Route path="/self-scoring" element={<SelfScoring />} />
-            <Route path="/self-scoring/:climberId" element={<SelfScoring />} />
             <Route path="/climber-profile/:climberId" element={<ClimberProfile />} />
+            <Route path="/self-scoring" element={<ClimberSelection />} />
+            <Route path="/self-scoring/:climberId" element={<ScoringForm />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
           <Footer />

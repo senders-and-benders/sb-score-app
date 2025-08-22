@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { Typography, Box, Card, Divider } from '@mui/material';
+import { Typography, Box, Card, Divider, Stack } from '@mui/material';
 import {
   Add as AddIcon,
-  Terrain as MountainIcon
+  Terrain as MountainIcon,
+  Edit as EditIcon,
+  ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 
 // Services
 import { getClimberScores, deleteScore } from '../services/APIService';
 
 // Components
+import { ClimberHeaderCard } from '../components/ClimberCardGrid/ClimberCards';
 import ClimbingKPIChart from '../components/ClimbingDashboard/ClimbingDashboard';
 import ClimbingLog from '../components/ClimbingLog/ClimbingLog';
 import Button from '../components/Button';
@@ -58,25 +61,35 @@ const Scores = () => {
   return (
     <Box my={5}>
       {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
-          <Box>
-            <Typography variant="h2">Climber Profile</Typography>
-            <Typography variant="body1" color="text.secondary">
-              Hello {currentClimber.name}, your stats await you.
-            </Typography>
-          </Box>
-          <Button icon={AddIcon} label="Add Climb" path={`/self-scoring/${climberId}`} />
+      <Box my={2}>
+        <Typography variant="h2">Climber Profile</Typography>
+        <Typography variant="body1" color="text.secondary">
+          Hello, your stats await you.
+        </Typography>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}
+        mb={2}
+      >
+        <Box>
+          <Button icon={ArrowBackIcon} label="Select Climber" variant='text' path={`/climbers`} />
         </Box>
-      
+        <Stack direction="row" spacing={2}>
+          <Button icon={AddIcon} label="Add Climb" path={`/self-scoring/${climberId}`} />
+          {/* <Button icon={EditIcon} variant='outlined'  label='Edit Profile' /> */}
+        </Stack>
+      </Box>
+      <ClimberHeaderCard climber={currentClimber}/>
+
       {error && <div className="error">{error}</div>}
 
       {/* Move Divider to center the gap */}
+
       <Divider sx={{ my: 2 }} />
 
       {/* Dashboard */}

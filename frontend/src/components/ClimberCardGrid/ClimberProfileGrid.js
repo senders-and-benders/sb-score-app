@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Grid';
 import CircularProgress from '@mui/material/CircularProgress';
-import ClimberProfileCard from './ClimberProfileCard';
+import { ClimberSelectCard } from './ClimberCards';
 
 const ClimberProfileGrid = ({
   climbers,
@@ -18,7 +18,7 @@ const ClimberProfileGrid = ({
     <Grid container spacing={2} justifyContent="center">
       {climbers.map(climber => (
         <Grid item key={climber.id}>
-          <ClimberProfileCard 
+          <ClimberSelectCard 
             key={climber.id} 
             climber={climber} 
             onClick={() => onClimberClick(climber.id)} 
