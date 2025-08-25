@@ -38,11 +38,10 @@ group_by_climber as (
 	select 
 		climber_id,
 		'All' as climb_type, -- We treat both as a climb_type
-		count(*) as total_climbs,
-		sum(score) as total_score,
-		cast(sum(score) as float) / count(*) as avg_score
-	from rank_best 
-	where all_score_rank <= 10
+		sum(total_climbs) as total_climbs,
+		sum(total_score) as total_score,
+		cast(sum(total_score) as float) / sum(total_climbs) as avg_score
+	from group_by_climber_and_type 
 	group by 1
 ),
 unioned as (
