@@ -25,7 +25,7 @@ const getColorForGrade = (grade) => {
   return matchedKey ? GRADE_COLOUR_MAPPING[matchedKey] : '#000000ff';
 };
 
-export const ClimbingGradeGauge = ({ title, grade, value}) => (
+export const ClimbingGradeGauge = ({ title, grade, value }) => (
   <ClimbingKPIContainer title={title}>
     <Gauge
       value={value}

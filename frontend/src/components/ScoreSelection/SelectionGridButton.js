@@ -6,7 +6,8 @@ const SelectionGridButton = ({ display, selected, onClick, colorScheme }) => {
     blue: { bg: '#e3f2fd', border: '#2196f3' },
     green: { bg: '#e8f5e8', border: '#4caf50' },
     orange: { bg: '#fff3e0', border: '#ff9800' },
-    purple: { bg: '#f3e5f5', border: '#9c27b0ff' }
+    purple: { bg: '#f3e5f5', border: '#9c27b0ff' },
+    red: { bg: '#ffebee', border: '#f44336' }
   };
   const scheme = colors[colorScheme] || colors.blue;
 

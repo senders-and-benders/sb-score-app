@@ -338,10 +338,11 @@ def add_score():
     if not data or not all(field in data for field in required_fields):
         return jsonify({'error': 'Climber ID, route ID, completed status, and attempts are required'}), 400
 
-    query = '''INSERT INTO scores (climber_id, wall_id, grade, completed, attempts, notes) VALUES (%s, %s, %s, %s, %s, %s)'''
+    query = '''INSERT INTO scores (climber_id, wall_id, climb_sub_type, grade, completed, attempts, notes) VALUES (%s, %s, %s, %s, %s, %s, %s)'''
     params = (
         data['climber_id'],
         data['wall_id'],
+        data['climb_sub_type'],
         data['grade'],
         data['completed'],
         data['attempts'],

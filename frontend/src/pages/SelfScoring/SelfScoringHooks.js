@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { 
   getClimbers, getGyms, getGymAreas, getGymAreaWalls, 
   getGymAreaGrades, getClimberScores, addScore, deleteScore 
-} from '../services/APIService';
+} from '../../services/APIService';
 
 export const useScoring = (climberId) => {
   const [state, setState] = useState({
@@ -11,6 +11,7 @@ export const useScoring = (climberId) => {
       gyms: [],
       gymAreas: [],
       wallAreas: [],
+      climbSubTypes: [],
       walls: [],
       ropeNumbers: [],
       grades: [],
@@ -22,6 +23,7 @@ export const useScoring = (climberId) => {
     selections: {
       gym_id: '',
       gym_area_id: '',
+      climb_sub_type: '',
       wall_area_name: '',
       wall_id: '',
       grade: ''
@@ -92,6 +94,28 @@ export const useScoring = (climberId) => {
     }
   };
 
+  // NO API CALL YET, SUPER SIMPLE THING
+  const fetchClimbSubTypes = async (gymAreaId) => {
+    try {
+      
+      const selectedGymArea = state.data.gymAreas.find(area => area.id === parseInt(gymAreaId));
+      const climbType = selectedGymArea?.climb_type;
+      
+      let response = [];
+      if (climbType === 'Bouldering') {
+        response = [{ value: 'Bouldering', label: 'Bouldering' }];
+      } else if (climbType === 'Ropes') {
+        response = [
+          { value: 'Lead', label: 'Lead' },
+          { value: 'Top Rope', label: 'Top Rope' }
+        ];
+      }
+      updateData({ climbSubTypes: response });
+    } catch (err) {
+      updateState({ error: 'Failed to load climb types' });
+    }
+  };
+
   const fetchWallAreasAndGrades = async (gymAreaId) => {
     try {
       if (!gymAreaId) {
@@ -134,12 +158,14 @@ export const useScoring = (climberId) => {
         updateSelections({ 
           gym_id: value, 
           gym_area_id: '', 
+          climb_sub_type: '',
           wall_area_name: '', 
           wall_id: '', 
           grade: '' 
         });
         updateData({ 
           gymAreas: [], 
+          climbSubTypes: [],
           wallAreas: [], 
           walls: [], 
           ropeNumbers: [], 
@@ -150,12 +176,30 @@ export const useScoring = (climberId) => {
       area: () => {
         updateSelections({ 
           gym_area_id: value, 
+          climb_sub_type: '',
           wall_area_name: '', 
           wall_id: '', 
           grade: '' 
         });
-        updateData({ wallAreas: [], walls: [], ropeNumbers: [], grades: [] });
-        if (value) fetchWallAreasAndGrades(value);
+        updateData({ 
+          climbSubTypes: [],
+          wallAreas: [], 
+          walls: [], 
+          ropeNumbers: [], 
+          grades: [] 
+        });
+        if (value) {
+          fetchWallAreasAndGrades(value);
+          fetchClimbSubTypes(value);
+        };
+      },
+      climb_type: () => {
+        updateSelections({ 
+          climb_sub_type: value,
+          wall_area_name: '', 
+          wall_id: '', 
+          grade: '' 
+        });
       },
       wall: () => {
         updateData({ ropeNumbers: [] });
@@ -205,6 +249,7 @@ export const useScoring = (climberId) => {
     updateSelections({
       gym_id: '',
       gym_area_id: '',
+      climb_sub_type: '',
       wall_area_name: '',
       wall_id: '',
       grade: ''
@@ -213,6 +258,7 @@ export const useScoring = (climberId) => {
     updateData({ 
       gymAreas: [], 
       wallAreas: [], 
+      climbSubTypes: [],
       walls: [], 
       ropeNumbers: [], 
       grades: [] 

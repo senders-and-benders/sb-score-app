@@ -7,7 +7,7 @@ select
   c.name as climber_name,
   g.name as gym_name,
   a.name as gym_area_name,
-  a.climb_type,
+  s.climb_sub_type as climb_type,
   w.wall_name,
   w.wall_number,
   s.grade,

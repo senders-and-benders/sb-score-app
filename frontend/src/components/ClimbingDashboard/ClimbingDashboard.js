@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Card, CardContent, Typography, Grid, CircularProgress } from '@mui/material'
+import { Box, Card, CardContent, Typography, Grid, CircularProgress, Stack } from '@mui/material'
 import { getClimberStatsLast30DaysMetrics, getAvgGradeLast60Days, getClimberStatsLast30DaysDailySummary, getClimberStatsLast30DaysData } from '../../services/APIService';
 import { ClimbingKPI, ClimbingKPIText } from './ClimbingKPI';
 import { GroupedBarChart } from './ClimbingBar';
@@ -36,7 +36,8 @@ const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
       setAvgGradeData({
         all: avgGradeDataArr.find(climb => climb.climb_type === 'All'),
         bouldering: avgGradeDataArr.find(climb => climb.climb_type === 'Bouldering'),
-        ropes: avgGradeDataArr.find(climb => climb.climb_type === 'Ropes')
+        top: avgGradeDataArr.find(climb => climb.climb_type === 'Top Rope'),
+        lead: avgGradeDataArr.find(climb => climb.climb_type === 'Lead')
       });
       const day_response = await getClimberStatsLast30DaysDailySummary(climberID);
       setClimbingDailyData({
@@ -47,7 +48,8 @@ const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
       const data_response = await getClimberStatsLast30DaysData(climberID);
       setClimbingBarData({
         bouldering: data_response.filter(climb => climb.climb_type === 'Bouldering'),
-        ropes: data_response.filter(climb => climb.climb_type === 'Ropes')
+        top: data_response.filter(climb => climb.climb_type === 'Top Rope'),
+        lead: data_response.filter(climb => climb.climb_type === 'Lead')
       });
       setError(null);
     } catch (err) {
@@ -88,36 +90,33 @@ const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
         How it's calculated: Takes the top 10 climbs over the last 60 days and averages the score. The score is mapped back to a grade. 
         The remainder represents progress towards the next grade.
       </Typography>
-      <Grid my={2} container spacing={3} justifyContent="center" alignItems="center">
+      <Stack my={2} spacing={3} justifyContent="center" alignItems="center">
         {avgGradeData.all && (
-          <Grid size={{xs:12, sm:4}}>
-            <ClimbingGradeGauge
-              title="Average Grade - All"
-              grade={avgGradeData.all.avg_grade}
-              value={avgGradeData.all.perc_to_next_grade * 100} // Gauge max value is 100
+          <ClimbingGradeGauge
+            title="Average Grade - All"
+            grade={avgGradeData.all.avg_grade}
+            value={avgGradeData.all.perc_to_next_grade * 100} // Gauge max value is 100
             />
+          )}
+          <Grid container spacing={2} justifyContent="center" alignItems="center" width="100%">
+            {Object.entries(avgGradeData)
+            .filter(([key]) => key !== 'all')
+            .map(([key, data]) => (
+              data && (
+              <Grid size={{xs:12, sm:4}} key={key}>
+                <ClimbingGradeGauge
+                  key={key}
+                  title={`Average Grade - ${data.climb_type}`}
+                  grade={data.avg_grade}
+                  value={data.perc_to_next_grade * 100}
+                />
+              </Grid>
+              )
+            ))
+            }
           </Grid>
-        )}
-        {avgGradeData.bouldering && (
-          <Grid size={{xs:6, sm:4}}>
-            <ClimbingGradeGauge
-              title="Average Grade - Bouldering"
-              grade={avgGradeData.bouldering.avg_grade}
-              value={avgGradeData.bouldering.perc_to_next_grade * 100} // Gauge max value is 100
-            />
-          </Grid>
-        )}
-        {avgGradeData.ropes && (
-          <Grid size={{xs:6, sm:4}}>
-            <ClimbingGradeGauge
-              title="Average Grade - Ropes"
-              grade={avgGradeData.ropes.avg_grade}
-              value={avgGradeData.ropes.perc_to_next_grade * 100} // Gauge max value is 100
-            />
-          </Grid>
-        )}
-      </Grid>
-      {/* Last 30 Days */}
+          </Stack>
+          {/* Last 30 Days */}
       <Typography my={2} variant="h4">Last 30 days statistics</Typography>
       <Grid container spacing={3} justifyContent="center" alignItems="center">
         <Grid size={{xs:12, sm:6}}>
@@ -142,11 +141,14 @@ const ClimbingDashboard = ({ climberID, refreshTrigger }) => {
             It took you <strong>{latestGreatestClimb.attempts}</strong> attempts.
           </ClimbingKPIText>
         </Grid>
-        <Grid size={{xs:12, sm:6}}>
+        <Grid size={{xs:12, sm:12}}>
           <GroupedBarChart climbs={climbingBarData.bouldering} title="# Climbs by Colour - Bouldering" />
         </Grid>
         <Grid size={{xs:12, sm:6}}>
-          <GroupedBarChart climbs={climbingBarData.ropes} title="# Climbs by Colour - Ropes" />
+          <GroupedBarChart climbs={climbingBarData.top} title="# Climbs by Colour - Top Rope" />
+        </Grid>
+        <Grid size={{xs:12, sm:6}}>
+          <GroupedBarChart climbs={climbingBarData.lead} title="# Climbs by Colour - Lead" />
         </Grid>
       </Grid>
     </Box>

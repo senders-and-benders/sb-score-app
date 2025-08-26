@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 
 // Custom hooks
-import { useScoring } from '../../hooks/useScoring';
+import { useScoring } from './SelfScoringHooks';
 
 // Components
 import { ClimberHeaderCard } from '../../components/ClimberCardGrid/ClimberCards';
@@ -60,6 +60,16 @@ const ScoringForm = () => {
       condition: state.selections.gym_id
     },
     {
+      key: 'climb_type',
+      title: `Select a climb type in ${selectedItems.area?.name || ''}:`,
+      items: state.data.climbSubTypes,
+      selectedValue: state.selections.climb_sub_type,
+      keyField: 'value',
+      displayField: 'label',
+      colorScheme: 'red',
+      condition: state.selections.gym_area_id
+    },
+    {
       key: 'wall',
       title: `Select a Wall in ${selectedItems.area?.name || ''}:`,
       items: state.data.wallAreas,
@@ -67,7 +77,7 @@ const ScoringForm = () => {
       keyField: 'wall_name',
       displayField: state.climbType === 'Ropes' ? 'rope_wall_name' : 'wall_name',
       colorScheme: 'orange',
-      condition: state.selections.gym_area_id
+      condition: state.selections.climb_sub_type
     },
     {
       key: 'rope',
@@ -99,6 +109,7 @@ const ScoringForm = () => {
       climber_id: parseInt(climberId),
       gym_id: parseInt(state.selections.gym_id),
       gym_area_id: parseInt(state.selections.gym_area_id),
+      climb_sub_type: state.selections.climb_sub_type,
       wall_id: parseInt(state.selections.wall_id),
       grade: state.selections.grade,
       completed: state.scoreDetails.completed,
@@ -130,6 +141,7 @@ const ScoringForm = () => {
     const parts = [];
     if (state.selections.gym_id && selectedItems.gym) parts.push(selectedItems.gym.name);
     if (state.selections.gym_area_id && selectedItems.area) parts.push(selectedItems.area.name);
+    if (state.selections.climb_sub_type) parts.push(state.selections.climb_sub_type);
     if (state.selections.wall_area_name) parts.push(state.selections.wall_area_name);
     if (state.climbType === 'Ropes' && state.selections.wall_id && selectedItems.rope) {
       parts.push(`#${selectedItems.rope.wall_number}`);
