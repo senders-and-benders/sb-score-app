@@ -89,6 +89,7 @@ export const useScoring = (climberId) => {
     try {
       const response = await getGymAreas(gymId);
       updateData({ gymAreas: response });
+
     } catch (err) {
       updateState({ error: 'Failed to load gym areas' });
     }
@@ -104,6 +105,7 @@ export const useScoring = (climberId) => {
       let response = [];
       if (climbType === 'Bouldering') {
         response = [{ value: 'Bouldering', label: 'Bouldering' }];
+        updateSelections({ climb_sub_type: 'Bouldering' }); // Autoset if bouldering is selected
       } else if (climbType === 'Ropes') {
         response = [
           { value: 'Lead', label: 'Lead' },
